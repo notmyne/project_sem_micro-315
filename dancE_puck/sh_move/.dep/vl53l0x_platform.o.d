@@ -46,7 +46,7 @@ build/obj/vl53l0x_platform.o: \
  ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/vl53l0x_api.h \
  ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/vl53l0x_api_strings.h \
  ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/vl53l0x_def.h \
- c:\users\victor\desktop\embraked_tps\lib\e-puck2_main-processor\src\sensors\vl53l0x\api\platform\inc\vl53l0x_platform.h
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/../../platform/inc/vl53l0x_platform.h
 
 ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../inc/vl53l0x_platform.h:
 
@@ -140,4 +140,4 @@ c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2
 
 ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/vl53l0x_def.h:
 
-c:\users\victor\desktop\embraked_tps\lib\e-puck2_main-processor\src\sensors\vl53l0x\api\platform\inc\vl53l0x_platform.h:
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/platform/src/../../core/inc/../../platform/inc/vl53l0x_platform.h:

@@ -7,9 +7,9 @@
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
-#include <communications.h>
 #include <fft.h>
 #include <arm_math.h>
+#include <audio/play_melody.h>
 
 //semaphore
 static BSEMAPHORE_DECL(sendToComputer_sem, TRUE);
@@ -90,20 +90,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 
 
-//#define SEND_DATA_TO_PC
-#ifdef SEND_DATA_TO_PC
 
-	if(cnt_process == 10){
-
-		chBSemSignal(&sendToComputer_sem);
-		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
-		const float peak_frequency = get_frequency(peak_pos);
-		chprintf((BaseSequentialStream *) &SDU1, "peak at %f Hz\r\n", peak_frequency);
-
-		command_motors(peak_frequency);
-		cnt_process = 0;
-	}
-#else
 	if (cnt_process > 0) {
 		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
@@ -112,14 +99,11 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 		cnt_process = 0;
 	}
-#endif
 
 }
 
 
-void wait_send_to_computer(void){
-	chBSemWait(&sendToComputer_sem);
-}
+
 
 float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 	if(name == LEFT_CMPLX_INPUT){
