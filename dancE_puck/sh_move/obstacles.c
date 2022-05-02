@@ -7,12 +7,12 @@ Principle of this file:
 * If too much corrections of positions, the bot considers itself blocked
 * When blocked, the bot controls sometimes if it can move again */
 
-/*#include "leds.h"
+#include "leds.h"
 #include "motors.h"
 #include "proximity.h"
 #include "obstacles.h"
-//#include <stdbool.h>
-*/
+
+#include <stdbool.h>
 #include <stdint.h>
 
 //Tout ce paragraphe a supprimer ne me sert qu'à chercher les erreurs dans Geany
@@ -26,18 +26,19 @@ int ctrl_if_no_more_obstacles();
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
 #define SPEED_DEFAULT 500		//steps/second, max 1000
+#define LIMIT 1					//proximity limit for obstacles
 
 uint8_t save_ir_dist(){
-	uint8_t all_prox = 0;
+	uint8_t all_prox = 0b0;
 	for (uint8_t ir_nb = 0; ir_nb < 8; ir_nb++) {
 		int val = get_prox(ir_nb);
-		int intermediary = val > limit;			//if high proximity
+		int intermediary = val > LIMIT;			//if high proximity
 		all_prox += intermediary << ir_nb;
 	}
-	if ((get_prox(0) > limit) || (get_prox(1) > limit)) {
+	if ((get_prox(0) > LIMIT) || (get_prox(1) > LIMIT)) {
 		all_prox = all_prox | 11000000;
 	}		//consider that Prox0 and Prox1 are nearly confounded
-	if ((get_prox(6) > limit) || (get_prox(7) > limit)) {
+	if ((get_prox(6) > LIMIT) || (get_prox(7) > LIMIT)) {
 		all_prox = all_prox | 00000011;
 	}		//consider that Prox6 and Prox7 are nearly confounded
 	return all_prox;
@@ -52,35 +53,35 @@ int correct_position_one_step(uint8_t all_prox, int nb_position_correct){
 		case 0 : 		//DANCE;
 		break;
 		
-		case 11111111:	alarm();
+		case 0b11111111:	alarm();
 		break; 
 		
-		case 11000000:	turn_left(45);
+		case 0b11000000:	turn_left(45);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		break;
 		
-		case 00100000:	turn_left(90);
+		case 0b00100000:	turn_left(90);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		break;
 		
-		case 00010000:	turn_left(135);
+		case 0b00010000:	turn_left(135);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		break;
 		
-		case 00001000:	turn_right(135);
+		case 0b00001000:	turn_right(135);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		break;
 		
-		case 00000100:	turn_right(90);
+		case 0b00000100:	turn_right(90);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		break;
 		
-		case 00000011:	turn_right(45);
+		case 0b00000011:	turn_right(45);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
 		
@@ -112,7 +113,7 @@ int correct_position_one_step(uint8_t all_prox, int nb_position_correct){
 }
 
 void avoid_obstacles(){
-	int limit = 1;									//limit of proximity
+	//int limit = 1;				//limit of proximity useless because #defined
 	int nb_position_correction_max = 1000;
 	int nb_position_correct = 0;
 	
@@ -121,9 +122,8 @@ void avoid_obstacles(){
 
 	uint8_t all_prox = save_ir_dist();
 	if (nb_position_correct < nb_position_correction_max) {
-		nb_position_correction +=correct_position_one_step(all_prox, nb_position_correct);
+		nb_position_correct +=correct_position_one_step(all_prox, nb_position_correct);
 	}
-}
 }
 
 void move(int distance) {
@@ -140,8 +140,8 @@ void move(int distance) {
 
 
 void alarm(){			//if there are obstacles everywhere
-	bool blocked = 1
-	while (blocked = 1) {
+	bool blocked = 1;
+	while ((blocked == 1)) {
 		set_led(1, 1);
 		set_led(3, 1);
 		set_led(5, 1);
