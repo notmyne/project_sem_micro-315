@@ -5,7 +5,8 @@ Principle of this file:
 * - yes, everywhere --> alarm
 * - yes, somewhere --> moves in the first found free direction
 * If too much corrections of positions, the bot considers itself blocked
-* When blocked, the bot controls sometimes if it can move again */
+* When blocked, the bot controls sometimes if it can move again
+* main function here: void avoid_obstacles()*/
 
 #include "leds.h"
 #include "motors.h"
@@ -16,13 +17,13 @@ Principle of this file:
 #include <stdint.h>
 
 //Tout ce paragraphe a supprimer ne me sert qu'à chercher les erreurs dans Geany
-void avoid_obstacles();
+/*void avoid_obstacles();
 void move(int distance);
 void alarm();			//if there are obstacles everywhere
 void turn_right (int angle);
 void turn_left (int angle);
 uint8_t save_ir_dist();
-int ctrl_if_no_more_obstacles();
+int ctrl_if_no_more_obstacles();*/
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
 #define SPEED_DEFAULT 500		//steps/second, max 1000
