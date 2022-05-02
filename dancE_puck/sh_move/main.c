@@ -58,13 +58,12 @@ int main(void)
     //usb_start();
     //starts timer 12
     //timer12_start();
+
     //inits the motors
     motors_init();
     //initts the melody player
     playMelodyStart();
-
-
-
+    //intialize audio processing
     mic_start(&processAudioData);
 
 

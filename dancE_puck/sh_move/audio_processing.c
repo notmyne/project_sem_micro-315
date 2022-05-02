@@ -54,6 +54,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 	static uint8_t cnt_process = 0;
 	static uint16_t nb_sample = 0;
+	static uint8_t dance_status = 0;
 
 	//fills the input buffers of FFT_SIZE(*2) with 640samples/10ms
 	uint16_t i=0;

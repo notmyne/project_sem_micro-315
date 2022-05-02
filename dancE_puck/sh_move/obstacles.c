@@ -10,7 +10,7 @@ Principle of this file:
 
 #include "leds.h"
 #include "motors.h"
-#include "proximity.h"
+#include <sensors/proximity.h>
 #include "obstacles.h"
 
 #include <stdbool.h>
