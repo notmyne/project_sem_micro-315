@@ -11,7 +11,7 @@ Principle of this file:
 #include "leds.h"
 #include "motors.h"
 #include "proximity.h"
-#include "obstacles.h"
+#include <sensors/obstacles.h>
 
 #include <stdbool.h>
 #include <stdint.h>
