@@ -15,8 +15,7 @@ static THD_FUNCTION(Dance2Rev, arg) {
 
 
     while(1){
-
-
+    	dance_status = 0b1;
     }
 }
 

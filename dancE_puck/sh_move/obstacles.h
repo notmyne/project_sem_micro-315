@@ -5,12 +5,13 @@
 extern "C" {
 #endif*/
 
-void avoid_obstacles();
-void move(int distance);
-void alarm();			//if there are obstacles everywhere
-void turn_right (int angle);
-void turn_left (int angle);
-uint8_t save_ir_dist();
-int ctrl_if_no_more_obstacles();
+void avoid_obstacles(void);
+void move(uint16_t distance);
+void alarm(void);			//if there are obstacles everywhere
+void turn_right (uint16_t angle);
+void turn_left (uint16_t angle);
+uint8_t save_ir_dist(void);
+uint8_t ctrl_if_no_more_obstacles(void);
+uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct);
 
 #endif

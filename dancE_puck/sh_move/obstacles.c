@@ -29,7 +29,7 @@ int ctrl_if_no_more_obstacles();*/
 #define SPEED_DEFAULT 500		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
-uint8_t save_ir_dist(){
+uint8_t save_ir_dist(void){
 	uint8_t all_prox = 0b0;
 	for (uint8_t ir_nb = 0; ir_nb < 8; ir_nb++) {
 		int val = get_prox(ir_nb);
@@ -45,11 +45,11 @@ uint8_t save_ir_dist(){
 	return all_prox;
 }
 
-int ctrl_if_no_more_obstacles(){
+uint8_t ctrl_if_no_more_obstacles(void){
 	return (save_ir_dist() == 0);
 }
 
-int correct_position_one_step(uint8_t all_prox, int nb_position_correct){
+uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct){
 	switch (all_prox) {
 		case 0 : 		//DANCE;
 		break;
@@ -85,7 +85,7 @@ int correct_position_one_step(uint8_t all_prox, int nb_position_correct){
 		case 0b00000011:	turn_right(45);
 						move(MOVE_DEFAULT);
 						nb_position_correct += 1;
-		
+		break;
 		default:		//plein de if;
 			if ((all_prox | 11101100) == 11111100) {
 				turn_right(45);
@@ -108,15 +108,14 @@ int correct_position_one_step(uint8_t all_prox, int nb_position_correct){
 			}
 			nb_position_correct += 1;
 		break;
-		
-		return nb_position_correct;			
 	}
+	return nb_position_correct;
 }
 
-void avoid_obstacles(){
+void avoid_obstacles(void){
 	//int limit = 1;				//limit of proximity useless because #defined
-	int nb_position_correction_max = 1000;
-	int nb_position_correct = 0;
+	uint16_t nb_position_correction_max = 1000;
+	uint16_t nb_position_correct = 0;
 	
 	proximity_start();
 	calibrate_ir();
@@ -127,7 +126,7 @@ void avoid_obstacles(){
 	}
 }
 
-void move(int distance) {
+void move(uint16_t distance) {
 	left_motor_set_pos(distance);
 	right_motor_set_pos(distance);
 	
@@ -140,8 +139,8 @@ void move(int distance) {
 }
 
 
-void alarm(){			//if there are obstacles everywhere
-	bool blocked = 1;
+void alarm(void){			//if there are obstacles everywhere
+	uint8_t blocked = 1;
 	while ((blocked == 1)) {
 		set_led(1, 1);
 		set_led(3, 1);
@@ -156,7 +155,7 @@ void alarm(){			//if there are obstacles everywhere
 	}
 }
 
-void turn_right (int angle) {
+void turn_right (uint16_t angle) {
 	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter
 	left_motor_set_pos(-nb_steps);
 	right_motor_set_pos(nb_steps);
@@ -169,7 +168,7 @@ void turn_right (int angle) {
 	 * */
 }
 
-void turn_left (int angle){
+void turn_left (uint16_t angle){
 	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter
 	left_motor_set_pos(nb_steps);
 	right_motor_set_pos(-nb_steps);
