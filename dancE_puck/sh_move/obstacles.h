@@ -12,3 +12,5 @@ void turn_right (int angle);
 void turn_left (int angle);
 uint8_t save_ir_dist();
 int ctrl_if_no_more_obstacles();
+
+#endif
