@@ -16,7 +16,7 @@ Principle of this file:
 #include <stdbool.h>
 #include <stdint.h>
 
-//Tout ce paragraphe a supprimer ne me sert qu'à chercher les erreurs dans Geany
+//Sert seulement � tester compilation de fichier seul
 /*void avoid_obstacles();
 void move(int distance);
 void alarm();			//if there are obstacles everywhere
@@ -49,7 +49,8 @@ uint8_t ctrl_if_no_more_obstacles(void){
 	return (save_ir_dist() == 0);
 }
 
-uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct){
+uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_position_correct
+	uint8_t has_corrected_pos = 0;
 	switch (all_prox) {
 		case 0 : 		//DANCE;
 		break;
@@ -59,32 +60,32 @@ uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct
 		
 		case 0b11000000:	turn_left(45);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		
 		case 0b00100000:	turn_left(90);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		
 		case 0b00010000:	turn_left(135);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		
 		case 0b00001000:	turn_right(135);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		
 		case 0b00000100:	turn_right(90);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		
 		case 0b00000011:	turn_right(45);
 						move(MOVE_DEFAULT);
-						nb_position_correct += 1;
+						has_corrected_pos += 1;
 		break;
 		default:		//plein de if;
 			if ((all_prox | 11101100) == 11111100) {
@@ -106,10 +107,10 @@ uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct
 				turn_left(90);
 				move(MOVE_DEFAULT);
 			}
-			nb_position_correct += 1;
+			has_corrected_pos += 1;
 		break;
 	}
-	return nb_position_correct;
+	return has_corrected_pos;
 }
 
 void avoid_obstacles(void){
@@ -122,7 +123,7 @@ void avoid_obstacles(void){
 
 	uint8_t all_prox = save_ir_dist();
 	if (nb_position_correct < nb_position_correction_max) {
-		nb_position_correct +=correct_position_one_step(all_prox, nb_position_correct);
+		nb_position_correct +=correct_position_one_step(all_prox);
 	}
 }
 
@@ -130,11 +131,12 @@ void move(uint16_t distance) {
 	left_motor_set_pos(distance);
 	right_motor_set_pos(distance);
 	
-	/* Variante si jamais ça marche pas
+	/* Variante si ne marche pas
 	 * left_motor_set_speed(SPEED_DEFAULT);
-	 * chThdSleepMilliseconds(distance/SPEED_DEFAULT);
-	 * righot_motor_set_speed(SPEED_DEFAULT);
+	 * right_motor_set_speed(SPEED_DEFAULT);
 	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
+	 * left_motor_set_speed(0);
+	 * right_motor_set_speed(0);
 	 * */
 }
 
@@ -160,11 +162,12 @@ void turn_right (uint16_t angle) {
 	left_motor_set_pos(-nb_steps);
 	right_motor_set_pos(nb_steps);
 
-	/* Variante si jamais ça marche pas
+	/* Variante si ne marche pas
 	 * left_motor_set_speed(-SPEED_DEFAULT);
-	 * chThdSleepMilliseconds(distance/SPEED_DEFAULT);
 	 * righot_motor_set_speed(SPEED_DEFAULT);
 	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
+	 * left_motor_set_speed(0);
+	 * righot_motor_set_speed(0);
 	 * */
 }
 
@@ -173,10 +176,11 @@ void turn_left (uint16_t angle){
 	left_motor_set_pos(nb_steps);
 	right_motor_set_pos(-nb_steps);
 	
-	/* Variante si jamais ça marche pas
+	/* Variante si ne marche pas
 	 * left_motor_set_speed(SPEED_DEFAULT);
-	 * chThdSleepMilliseconds(distance/SPEED_DEFAULT);
 	 * righot_motor_set_speed(-SPEED_DEFAULT);
 	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
+	 * left_motor_set_speed(0);
+	 * righot_motor_set_speed(0);
 	 * */
 }

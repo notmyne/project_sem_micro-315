@@ -12,6 +12,6 @@ void turn_right (uint16_t angle);
 void turn_left (uint16_t angle);
 uint8_t save_ir_dist(void);
 uint8_t ctrl_if_no_more_obstacles(void);
-uint8_t correct_position_one_step(uint8_t all_prox, uint16_t nb_position_correct);
+uint8_t correct_position_one_step(uint8_t all_prox);
 
 #endif
