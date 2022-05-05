@@ -7,6 +7,7 @@
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
+#include <communications.h>
 #include <fft.h>
 #include <arm_math.h>
 #include <audio/play_melody.h>
@@ -54,7 +55,6 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 	static uint8_t cnt_process = 0;
 	static uint16_t nb_sample = 0;
-	static uint8_t dance_status = 0;
 
 	//fills the input buffers of FFT_SIZE(*2) with 640samples/10ms
 	uint16_t i=0;
@@ -91,7 +91,20 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 
 
+//#define SEND_DATA_TO_PC
+#ifdef SEND_DATA_TO_PC
 
+	if(cnt_process == 10){
+
+		chBSemSignal(&sendToComputer_sem);
+		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
+		const float peak_frequency = get_frequency(peak_pos);
+		chprintf((BaseSequentialStream *) &SDU1, "peak at %f Hz\r\n", peak_frequency);
+
+		command_motors(peak_frequency);
+		cnt_process = 0;
+	}
+#else
 	if (cnt_process > 0) {
 		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
@@ -100,11 +113,14 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 		cnt_process = 0;
 	}
+#endif
 
 }
 
 
-
+void wait_send_to_computer(void){
+	chBSemWait(&sendToComputer_sem);
+}
 
 float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 	if(name == LEFT_CMPLX_INPUT){
@@ -162,6 +178,7 @@ float get_frequency(uint16_t peak_pos) {
 
 void command_motors(float frequency) {
 	if (frequency > 1000.0f) {
+
 		uint16_t speed = (uint16_t) (frequency / 4.0f);
 		if (speed > 2200)
 			speed = 2200;
