@@ -29,6 +29,22 @@ int ctrl_if_no_more_obstacles();*/
 #define SPEED_DEFAULT 500		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
+//------------------------OBSTACLES AVOIDANCE----------------------------------------
+
+void avoid_obstacles(void){
+	//int limit = 1;				//limit of proximity useless because #defined
+	uint16_t nb_position_correction_max = 1000;
+	uint16_t nb_position_correct = 0;
+
+	proximity_start();
+	calibrate_ir();
+
+	uint8_t all_prox = save_ir_dist();
+	if (nb_position_correct < nb_position_correction_max) {
+		nb_position_correct +=correct_position_one_step(all_prox);
+	}
+}
+
 uint8_t save_ir_dist(void){
 	uint8_t all_prox = 0b0;
 	for (uint8_t ir_nb = 0; ir_nb < 8; ir_nb++) {
@@ -113,34 +129,6 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 	return has_corrected_pos;
 }
 
-void avoid_obstacles(void){
-	//int limit = 1;				//limit of proximity useless because #defined
-	uint16_t nb_position_correction_max = 1000;
-	uint16_t nb_position_correct = 0;
-	
-	proximity_start();
-	calibrate_ir();
-
-	uint8_t all_prox = save_ir_dist();
-	if (nb_position_correct < nb_position_correction_max) {
-		nb_position_correct +=correct_position_one_step(all_prox);
-	}
-}
-
-void move(uint16_t distance) {
-	left_motor_set_pos(distance);
-	right_motor_set_pos(distance);
-	
-	/* Variante si ne marche pas
-	 * left_motor_set_speed(SPEED_DEFAULT);
-	 * right_motor_set_speed(SPEED_DEFAULT);
-	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
-	 * left_motor_set_speed(0);
-	 * right_motor_set_speed(0);
-	 * */
-}
-
-
 void alarm(void){			//if there are obstacles everywhere
 	uint8_t blocked = 1;
 	while ((blocked == 1)) {
@@ -155,6 +143,21 @@ void alarm(void){			//if there are obstacles everywhere
 		set_led(7, 0);
 		if (ctrl_if_no_more_obstacles()) {blocked = 0;}
 	}
+}
+
+//------------------------MOVES--------------------------------
+
+void move(uint16_t distance) {
+	left_motor_set_pos(distance);
+	right_motor_set_pos(distance);
+
+	/* Variante si ne marche pas
+	 * left_motor_set_speed(SPEED_DEFAULT);
+	 * right_motor_set_speed(SPEED_DEFAULT);
+	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
+	 * left_motor_set_speed(0);
+	 * right_motor_set_speed(0);
+	 * */
 }
 
 void turn_right (uint16_t angle) {
