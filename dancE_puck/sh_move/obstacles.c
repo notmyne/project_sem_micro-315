@@ -170,7 +170,7 @@ void turn_right (uint16_t angle) {
 	 * righot_motor_set_speed(SPEED_DEFAULT);
 	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
 	 * left_motor_set_speed(0);
-	 * righot_motor_set_speed(0);
+	 * right_motor_set_speed(0);
 	 * */
 }
 
@@ -184,6 +184,6 @@ void turn_left (uint16_t angle){
 	 * righot_motor_set_speed(-SPEED_DEFAULT);
 	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
 	 * left_motor_set_speed(0);
-	 * righot_motor_set_speed(0);
+	 * right_motor_set_speed(0);
 	 * */
 }
