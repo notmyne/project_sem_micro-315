@@ -70,71 +70,40 @@ int main(void)
     timer12_start();
     //inits the motors
     motors_init();
-
+    //start AUDIO MODULE, AMP ETC
     dac_start();
+    //init audio module
     playMelodyStart();
     //send_tab is used to save the state of the buffer to send (double buffering)
-    //to avoid modifications of the buffer while sending it
+#ifdef DOUBLE_BUFFERING
     static float send_tab[FFT_SIZE];
+#endif  /* DOUBLE_BUFFERING */
 
 #ifdef SEND_FROM_MIC
     //starts the microphones processing thread.
     //it calls the callback given in parameter when samples are ready
-    mic_start(&processAudioData);
+    //mic_start(&processAudioData);
 #endif  /* SEND_FROM_MIC */
 
     /* Infinite loop. */
     while (1) {
+
 #ifdef SEND_FROM_MIC
         //waits until a result must be sent to the computer
-        wait_send_to_computer();
+        //wait_send_to_computer();
 #ifdef DOUBLE_BUFFERING
         //we copy the buffer to avoid conflicts
         arm_copy_f32(get_audio_buffer_ptr(LEFT_OUTPUT), send_tab, FFT_SIZE);
-        SendFloatToComputer((BaseSequentialStream *) &SD3, send_tab, FFT_SIZE);
-#else
-        SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
-#else
-
-        float* bufferCmplxInput = get_audio_buffer_ptr(LEFT_CMPLX_INPUT);
-        float* bufferOutput = get_audio_buffer_ptr(LEFT_OUTPUT);
+#endif /*SNED FROM MIC*/
 
 
-        uint16_t size = ReceiveInt16FromComputer((BaseSequentialStream *) &SD3, bufferCmplxInput, FFT_SIZE);
-
-//        for(uint32_t i=0; i < FFT_SIZE; i++){
-//        	altBufferCmplxInput[i].real = bufferCmplxInput[2*i];
-//        	altBufferCmplxInput[i].imag = bufferCmplxInput[2*i+1];
-//        }
 
 
-        if(size == FFT_SIZE){
-//        	volatile uint16_t time=0;
-//        	chSysLock();
-//        	GPTD12.tim->CNT=0;
+        chThdSleepMilliseconds(5000);
 
-        	//doFFT_c(FFT_SIZE,altBufferCmplxInput);
-
-
-        	doFFT_optimized(FFT_SIZE, bufferCmplxInput);
-
-//        	for(uint32_t k=0; k < FFT_SIZE; k++){
-//        		bufferCmplxInput[2*k] = altBufferCmplxInput[k].real;
-//        		bufferCmplxInput[2*k+1] = altBufferCmplxInput[k].imag ;
-//        	}
-
-            arm_cmplx_mag_f32(bufferCmplxInput, bufferOutput, FFT_SIZE);
-
-//        	time = GPTD12.tim->CNT;
-//        	chSysUnlock();
-//        	chprintf((BaseSequentialStream *)&SDU1, "time=%dus\n",time);
-
-            SendFloatToComputer((BaseSequentialStream *) &SD3, bufferOutput, FFT_SIZE);
-
-        }
-#endif  /* SEND_FROM_MIC */
     }
+
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

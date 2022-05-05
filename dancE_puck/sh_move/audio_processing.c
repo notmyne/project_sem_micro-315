@@ -109,7 +109,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
 
-		command_motors(peak_frequency);
+		//command_motors(peak_frequency);
 
 		cnt_process = 0;
 	}
