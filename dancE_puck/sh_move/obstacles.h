@@ -5,9 +5,13 @@
 extern "C" {
 #endif*/
 
+#define POSITION_NOT_REACHED 0
+#define POSITION_REACHED 1
+
+
 void avoid_obstacles(void);
-void move(uint16_t distance);
-void alarm(void);			//if there are obstacles everywhere
+void move(int16_t distance);
+void obsAlarm(void);			//if there are obstacles everywhere
 void turn_right (uint16_t angle);
 void turn_left (uint16_t angle);
 uint8_t save_ir_dist(void);

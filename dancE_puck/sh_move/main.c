@@ -17,9 +17,10 @@
 #include <arm_math.h>
 #include <audio/play_melody.h>
 #include <audio/audio_thread.h>
+#include <obstacles.h>
 
 //uncomment to send the FFTs results from the real microphones
-#define SEND_FROM_MIC
+//#define SEND_FROM_MIC
 
 //uncomment to use double buffering to send the FFT to the computer
 //#define DOUBLE_BUFFERING
@@ -55,6 +56,28 @@ static void timer12_start(void){
     gptStartContinuous(&GPTD12, 0xFFFF);
 }
 
+static THD_WORKING_AREA(waTestThd, 256);
+static THD_FUNCTION(TestThd, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+    //systime_t time;
+    move(-500);
+
+    while(1){
+        //time = chVTGetSystemTime();
+
+
+        //100Hz
+        //chThdSleepUntilWindowed(time, time + MS2ST(2000));
+    }
+}
+
+void testThd_start(void){
+	chThdCreateStatic(waTestThd, sizeof(waTestThd), NORMALPRIO, TestThd, NULL);
+}
+
 int main(void)
 {
 
@@ -75,14 +98,15 @@ int main(void)
     //init audio module
     playMelodyStart();
     //send_tab is used to save the state of the buffer to send (double buffering)
+    testThd_start();
 #ifdef DOUBLE_BUFFERING
     static float send_tab[FFT_SIZE];
 #endif  /* DOUBLE_BUFFERING */
 
 #ifdef SEND_FROM_MIC
-    //starts the microphones processing thread.
-    //it calls the callback given in parameter when samples are ready
-    //mic_start(&processAudioData);
+//    starts the microphones processing thread.
+//    it calls the callback given in parameter when samples are ready
+    mic_start(&processAudioData);
 #endif  /* SEND_FROM_MIC */
 
     /* Infinite loop. */
@@ -96,11 +120,12 @@ int main(void)
         arm_copy_f32(get_audio_buffer_ptr(LEFT_OUTPUT), send_tab, FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
 #endif /*SNED FROM MIC*/
+//        playMelody(SANDSTORMS, ML_SIMPLE_PLAY, NULL);
+//        waitMelodyHasFinished();
+        //move(500);
 
 
-
-
-        chThdSleepMilliseconds(5000);
+     chThdSleepMilliseconds(1000);
 
     }
 

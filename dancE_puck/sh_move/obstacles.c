@@ -2,7 +2,7 @@
 Principle of this file:
 * Checks if obstacles. If:
 * - no --> dance time
-* - yes, everywhere --> alarm
+* - yes, everywhere --> obsAlarm
 * - yes, somewhere --> moves in the first found free direction
 * If too much corrections of positions, the bot considers itself blocked
 * When blocked, the bot controls sometimes if it can move again
@@ -15,6 +15,8 @@ Principle of this file:
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 
 //Sert seulement à tester compilation de fichier seul
 /*void avoid_obstacles();
@@ -26,7 +28,7 @@ uint8_t save_ir_dist();
 int ctrl_if_no_more_obstacles();*/
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
-#define SPEED_DEFAULT 500		//steps/second, max 1000
+#define SPEED_DEFAULT 800		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
 //------------------------OBSTACLES AVOIDANCE----------------------------------------
@@ -71,7 +73,7 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 		case 0 : 		//DANCE;
 		break;
 		
-		case 0b11111111:	alarm();
+		case 0b11111111:	obsAlarm();
 		break; 
 		
 		case 0b11000000:	turn_left(45);
@@ -129,7 +131,7 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 	return has_corrected_pos;
 }
 
-void alarm(void){			//if there are obstacles everywhere
+void obsAlarm(void){			//if there are obstacles everywhere
 	uint8_t blocked = 1;
 	while ((blocked == 1)) {
 		set_led(1, 1);
@@ -145,19 +147,34 @@ void alarm(void){			//if there are obstacles everywhere
 	}
 }
 
+
+
+
 //------------------------MOVES--------------------------------
 
-void move(uint16_t distance) {
-	left_motor_set_pos(distance);
-	right_motor_set_pos(distance);
+void move(int16_t distance) {
+	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
+	int16_t abs_dist = abs(distance);
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
+	if (distance < 0){
+		while(right_motor_get_pos() >= position_to_reach_right
+		    && left_motor_get_pos() >= position_to_reach_left){
+			left_motor_set_speed(-SPEED_DEFAULT);
+			right_motor_set_speed(-SPEED_DEFAULT);
+		}
+	}else{
+		while(right_motor_get_pos() <= position_to_reach_right
+				    && left_motor_get_pos() <= position_to_reach_left){
+			left_motor_set_speed(SPEED_DEFAULT);
+			right_motor_set_speed(SPEED_DEFAULT);
+		}
+	}
 
-	/* Variante si ne marche pas
-	 * left_motor_set_speed(SPEED_DEFAULT);
-	 * right_motor_set_speed(SPEED_DEFAULT);
-	 * chfThdSleepMilliseconds(distance/SPEED_DEFAULT);
-	 * left_motor_set_speed(0);
-	 * right_motor_set_speed(0);
-	 * */
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
+//	position_to_reach_left  = 0;
+//	position_to_reach_right = 0;
 }
 
 void turn_right (uint16_t angle) {
