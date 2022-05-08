@@ -18,6 +18,8 @@
 #include <audio/play_melody.h>
 #include <audio/audio_thread.h>
 #include <obstacles.h>
+#include <dances.h>
+
 
 //uncomment to send the FFTs results from the real microphones
 //#define SEND_FROM_MIC
