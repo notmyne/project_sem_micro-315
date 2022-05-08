@@ -31,8 +31,23 @@ int ctrl_if_no_more_obstacles();*/
 #define SPEED_DEFAULT 800		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
-//------------------------OBSTACLES AVOIDANCE----------------------------------------
+//------------------------OBSTACLES THREAD DECLARATION (mainly for IRs---------------
+static THD_WORKING_AREA(threadObstaclesWorkingArea, 128);
 
+static void threadObstacles(){
+	while(1) {
+		avoid_obstacles();
+		
+		sleep(500);
+	}
+}
+
+void obstacles_start() {
+	(void)chThdCreateStatic(threadObstaclesWorkingArea,
+		sizeof(threadObstaclesWorkingArea), NORMALPRIO, threadObstacles, NULL);
+	}
+
+//------------------------OBSTACLES AVOIDANCE----------------------------------------
 void avoid_obstacles(void){
 	//int limit = 1;				//limit of proximity useless because #defined
 	uint16_t nb_position_correction_max = 1000;
@@ -44,7 +59,7 @@ void avoid_obstacles(void){
 	uint8_t all_prox = save_ir_dist();
 	if (nb_position_correct < nb_position_correction_max) {
 		nb_position_correct +=correct_position_one_step(all_prox);
-	}
+	} else {obsAlarm();}
 }
 
 uint8_t save_ir_dist(void){
@@ -146,9 +161,6 @@ void obsAlarm(void){			//if there are obstacles everywhere
 		if (ctrl_if_no_more_obstacles()) {blocked = 0;}
 	}
 }
-
-
-
 
 //------------------------MOVES--------------------------------
 
