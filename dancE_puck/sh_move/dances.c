@@ -16,6 +16,11 @@
 #include <audio/audio_thread.h>
 #include <obstacles.h>
 
+//local current dance variable
+static dance_choice_t current_song = CORNER_GUY_D;
+
+
+//tempos of the dance repertoire
 // Pirates of the Caribbean main theme tempo
 static const float pirate_tempo[] = {
   10, 10, 5, 10, 10,
@@ -122,6 +127,17 @@ static const float starwars_tempo[] = {
 	4.8, 12, 3.6, 4.8, 12, 3.6
 };
 
+
+//------------------------------------INTERNAL FUNCTIONS-----------------------------------------
+
+
+
+
+
+
+//-----------------------------------END INTERNAL FUNCTIONS--------------------------------------
+
+
 static THD_WORKING_AREA(waDanceThd, 512);
 static THD_FUNCTION(DanceThd, arg) {
 
@@ -137,9 +153,24 @@ static THD_FUNCTION(DanceThd, arg) {
 
         //chThdSleepUntilWindowed(time, time + MS2ST(2000));
     	chThdSleepMilliseconds(1000);
+    }
 
 }
 
+
+//------------------------------------EXTERNAL FUNCTIONS-----------------------------------------
 void danceThd_start(void){
 	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);
 }
+
+
+void danceChangeSong(dance_choice_t dnc){
+	current_song = dnc;
+}
+
+dance_choice_t danceGetSong(void){
+	return current_song;
+}
+
+
+//-----------------------------------END ExTERNAL FUNCTIONS--------------------------------------

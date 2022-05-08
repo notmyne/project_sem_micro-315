@@ -65,7 +65,7 @@ static THD_FUNCTION(TestThd, arg) {
     (void)arg;
 
     //systime_t time;
-    move(-500);
+    turn_left(45);
 
     while(1){
         //time = chVTGetSystemTime();

@@ -34,15 +34,18 @@ int ctrl_if_no_more_obstacles();*/
 //------------------------OBSTACLES THREAD DECLARATION (mainly for IRs---------------
 static THD_WORKING_AREA(threadObstaclesWorkingArea, 128);
 
-static void threadObstacles(){
+static THD_FUNCTION(threadObstacles, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
 	while(1) {
 		avoid_obstacles();
 		
-		sleep(500);
+		chThdSleepMilliseconds(500);
 	}
 }
 
-void obstacles_start() {
+void obstacles_start(void) {
 	(void)chThdCreateStatic(threadObstaclesWorkingArea,
 		sizeof(threadObstaclesWorkingArea), NORMALPRIO, threadObstacles, NULL);
 	}
@@ -166,7 +169,6 @@ void obsAlarm(void){			//if there are obstacles everywhere
 
 void move(int16_t distance) {		// distance must be given in steps
 	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
-	int16_t abs_dist = abs(distance);
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
 	if (distance < 0){
@@ -182,14 +184,13 @@ void move(int16_t distance) {		// distance must be given in steps
 			right_motor_set_speed(SPEED_DEFAULT);
 		}
 	}
-
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 //	position_to_reach_left  = 0;
 //	position_to_reach_right = 0;
 }
 
-void turn_right (uint16_t angle) {
+void turn_left (uint16_t angle) {
 	int16_t pos_to_reach_right = 3.6179*angle, pos_to_reach_left = -pos_to_reach_right;
 	
 	left_motor_set_pos(0);
@@ -199,7 +200,7 @@ void turn_right (uint16_t angle) {
 			&& right_motor_get_pos() <= pos_to_reach_right) {
 		left_motor_set_speed(-SPEED_DEFAULT);
 		right_motor_set_speed(SPEED_DEFAULT);
-	
+	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 /*	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter
@@ -213,7 +214,7 @@ void turn_right (uint16_t angle) {
 	*/
 }
 
-void turn_left (uint16_t angle){
+void turn_right (uint16_t angle){
 	int16_t pos_to_reach_left = 3.6179*angle, pos_to_reach_right = -pos_to_reach_left;
 	
 	left_motor_set_pos(0);
@@ -223,7 +224,7 @@ void turn_left (uint16_t angle){
 			&& right_motor_get_pos() >= pos_to_reach_right) {
 		left_motor_set_speed(SPEED_DEFAULT);
 		right_motor_set_speed(-SPEED_DEFAULT);
-	
+	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 /*	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter

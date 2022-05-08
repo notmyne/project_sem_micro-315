@@ -14,6 +14,7 @@ void move(int16_t distance);
 void obsAlarm(void);			//if there are obstacles everywhere
 void turn_right (uint16_t angle);
 void turn_left (uint16_t angle);
+void obstacles_start(void);
 uint8_t save_ir_dist(void);
 uint8_t ctrl_if_no_more_obstacles(void);
 uint8_t correct_position_one_step(uint8_t all_prox);
