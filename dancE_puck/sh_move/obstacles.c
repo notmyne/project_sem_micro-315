@@ -88,7 +88,7 @@ uint8_t ctrl_if_no_more_obstacles(void){
 uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_position_correct
 	uint8_t has_corrected_pos = 0;
 	switch (all_prox) {
-		case 0 : 		//DANCE;
+		case 0 : 			chThdSleepMilliseconds(500); //DANCE;
 		break;
 		
 		case 0b11111111:	obsAlarm();
