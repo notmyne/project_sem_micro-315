@@ -19,7 +19,7 @@
 #include <audio/audio_thread.h>
 #include <obstacles.h>
 #include <dances.h>
-
+#include <sensors/proximity.h>
 
 //uncomment to send the FFTs results from the real microphones
 //#define SEND_FROM_MIC
@@ -29,6 +29,10 @@
 
 
 //static complex_float altBufferCmplxInput[FFT_SIZE];
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
 
 static void serial_start(void)
 {
@@ -99,9 +103,14 @@ int main(void)
     dac_start();
     //init audio module
     playMelodyStart();
-    //send_tab is used to save the state of the buffer to send (double buffering)
+
     testThd_start();
+
+    obstacles_start();
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
+
 #ifdef DOUBLE_BUFFERING
+    //send_tab is used to save the state of the buffer to send (double buffering)
     static float send_tab[FFT_SIZE];
 #endif  /* DOUBLE_BUFFERING */
 

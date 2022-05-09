@@ -56,8 +56,9 @@ void avoid_obstacles(void){
 	uint16_t nb_position_correction_max = 1000;
 	uint16_t nb_position_correct = 0;
 
-	proximity_start();
-	calibrate_ir();
+
+    calibrate_ir();
+    proximity_start();
 
 	uint8_t all_prox = save_ir_dist();
 	if (nb_position_correct < nb_position_correction_max) {

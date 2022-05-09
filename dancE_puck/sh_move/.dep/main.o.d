@@ -152,7 +152,7 @@ build/obj/main.o: main.c \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\math.h \
  ../../lib/e-puck2_main-processor/src/audio/play_melody.h \
  ../../lib/e-puck2_main-processor/src/audio/audio_thread.h obstacles.h \
- dances.h
+ dances.h ../../lib/e-puck2_main-processor/src/sensors/proximity.h
 
 c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\stdio.h:
 
@@ -471,3 +471,5 @@ c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2
 obstacles.h:
 
 dances.h:
+
+../../lib/e-puck2_main-processor/src/sensors/proximity.h:
