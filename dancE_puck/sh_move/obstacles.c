@@ -87,7 +87,7 @@ uint8_t ctrl_if_no_more_obstacles(void){
 }
 
 uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_position_correct
-	uint8_t has_corrected_pos = 0;
+	//uint8_t has_corrected_pos = 0;
 	switch (all_prox) {
 		case 0 : 			chThdSleepMilliseconds(500); //DANCE;
 		break;
@@ -97,32 +97,32 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 		
 		case 0b11000000:	turn_left(45);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		
 		case 0b00100000:	turn_left(90);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		
 		case 0b00010000:	turn_left(135);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		
 		case 0b00001000:	turn_right(135);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		
 		case 0b00000100:	turn_right(90);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		
 		case 0b00000011:	turn_right(45);
 						move(MOVE_DEFAULT);
-						has_corrected_pos += 1;
+						return 1;	//has_corrected_pos += 1;
 		break;
 		default:		//plein de if;
 			if ((all_prox | 11101100) == 11111100) {
@@ -144,10 +144,10 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 				turn_left(90);
 				move(MOVE_DEFAULT);
 			}
-			has_corrected_pos += 1;
+			return 1;	//has_corrected_pos += 1;
 		break;
 	}
-	return has_corrected_pos;
+	return 0;	//return has_corrected_pos;
 }
 
 void obsAlarm(void){			//if there are obstacles everywhere
