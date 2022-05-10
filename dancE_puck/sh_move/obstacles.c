@@ -86,56 +86,62 @@ uint8_t correct_position_one_step(uint8_t all_prox){
 		case 0b11111111:	obsAlarm();			//obstacles everywhere
 		break; 
 		
-		case 0b11000000:	turn_left(45);		//free only in front left
+		case 0b00111111:	turn_left(45);		//free only in front left
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
-		case 0b00100000:	turn_left(90);		//free only in left
+		case 0b11011111:	turn_left(90);		//free only in left
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
-		case 0b00010000:	turn_left(135);		//free only in back left
+		case 0b11101111:	turn_left(135);		//free only in back left
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
-		case 0b00001000:	turn_right(135);	//free only in back right
+		case 0b11110111:	turn_right(135);	//free only in back right
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
-		case 0b00000100:	turn_right(90);		//free only in right
+		case 0b11111011:	turn_right(90);		//free only in right
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
-		case 0b00000011:	turn_right(45);		//free only in right
+		case 0b11111100:	turn_right(45);		//free only in right
 							move(MOVE_DEFAULT);
 							return 1;
 		break;
 		
 		default:								//otherwise: tries most evident
-			if ((all_prox | 11101100) == 11111100) {
-				turn_right(45);
-				move(MOVE_DEFAULT);
-			} else if ((all_prox | 11101100) == 11101111) {
-				turn_left(135);
-				move(MOVE_DEFAULT);
-			} else if ((all_prox | 00110111) == 00111111) {
+			if ((all_prox | 00111111) == 00111111) {
 				turn_left(45);
 				move(MOVE_DEFAULT);
-			} else if ((all_prox | 00110111) == 11110111) {
-				turn_right(90);
-				move(MOVE_DEFAULT);
-			} else if ((all_prox | 11011011) == 11111011) {
-				turn_right(90);
-				move(MOVE_DEFAULT);
-			} else if ((all_prox | 11011011) == 11011111) {
+				return 1;
+			} else if ((all_prox | 11011111) == 11011111) {
 				turn_left(90);
 				move(MOVE_DEFAULT);
-			}
+				return 1;
+			} else if ((all_prox | 11101111) == 11101111) {
+				turn_left(135);
+				move(MOVE_DEFAULT);
+				return 1;
+			} else if ((all_prox | 11110111) == 11110111) {
+				turn_right(135);
+				move(MOVE_DEFAULT);
+				return 1;
+			} else if ((all_prox | 11111011) == 11111011) {
+				turn_right(90);
+				move(MOVE_DEFAULT);
+				return 1;
+			} else if ((all_prox | 11111100) == 11111100) {
+				turn_right(45);
+				move(MOVE_DEFAULT);
+				return 1;
+			}									//else is an impossible case, do what ?
 			return 1;
 		break;
 	}
