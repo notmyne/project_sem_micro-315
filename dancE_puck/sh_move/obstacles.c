@@ -116,28 +116,28 @@ uint8_t correct_position_one_step(uint8_t all_prox){
 							return 1;
 		break;
 		
-		default:								//otherwise: tries most evident
-			if ((all_prox | 00111111) == 00111111) {
+		default:								//otherwise: tries everything ccw
+			if (!(all_prox & 0b11000000)) {
 				turn_left(45);
 				move(MOVE_DEFAULT);
 				return 1;
-			} else if ((all_prox | 11011111) == 11011111) {
+			} else if (!(all_prox & 0b00100000)) {
 				turn_left(90);
 				move(MOVE_DEFAULT);
 				return 1;
-			} else if ((all_prox | 11101111) == 11101111) {
+			} else if (!(all_prox & 0b00010000)) {
 				turn_left(135);
 				move(MOVE_DEFAULT);
 				return 1;
-			} else if ((all_prox | 11110111) == 11110111) {
+			} else if (!(all_prox & 0b00001000)) {
 				turn_right(135);
 				move(MOVE_DEFAULT);
 				return 1;
-			} else if ((all_prox | 11111011) == 11111011) {
+			} else if (!(all_prox & 0b00000100)) {
 				turn_right(90);
 				move(MOVE_DEFAULT);
 				return 1;
-			} else if ((all_prox | 11111100) == 11111100) {
+			} else if (!(all_prox & 0b00000011)) {
 				turn_right(45);
 				move(MOVE_DEFAULT);
 				return 1;
