@@ -19,19 +19,13 @@ Principle of this file:
 
 
 //Sert seulement à tester compilation de fichier seul
-/*void avoid_obstacles();
-void move(int distance);
-void alarm();			//if there are obstacles everywhere
-void turn_right (int angle);
-void turn_left (int angle);
-uint8_t save_ir_dist();
-int ctrl_if_no_more_obstacles();*/
+/*void avoid_obstacles(); void move(int distance); void alarm(); void turn_right (int angle); void turn_left (int angle); uint8_t save_ir_dist(); int ctrl_if_no_more_obstacles();*/
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
 #define SPEED_DEFAULT 800		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
-//------------------------OBSTACLES THREAD DECLARATION (mainly for IRs---------------
+//------------------------OBSTACLES THREAD DECLARATION (mainly for IRs)--------------
 static THD_WORKING_AREA(threadObstaclesWorkingArea, 128);
 
 static THD_FUNCTION(threadObstacles, arg) {
@@ -52,17 +46,15 @@ void obstacles_start(void) {
 
 //------------------------OBSTACLES AVOIDANCE----------------------------------------
 void avoid_obstacles(void){
-	//int limit = 1;				//limit of proximity useless because #defined
-	uint16_t nb_position_correction_max = 1000;
-	uint16_t nb_position_correct = 0;
-
+	uint16_t nb_pos_corrections_max = 1000;
+	uint16_t nb_pos_corrections = 0;
 
     calibrate_ir();
     proximity_start();
 
 	uint8_t all_prox = save_ir_dist();
-	if (nb_position_correct < nb_position_correction_max) {
-		nb_position_correct +=correct_position_one_step(all_prox);
+	if (nb_pos_corrections < nb_pos_corrections_max) {
+		nb_pos_corrections +=correct_position_one_step(all_prox);
 	} else {obsAlarm();}
 }
 
@@ -70,7 +62,7 @@ uint8_t save_ir_dist(void){
 	uint8_t all_prox = 0b0;
 	for (uint8_t ir_nb = 0; ir_nb < 8; ir_nb++) {
 		int val = get_prox(ir_nb);
-		int intermediary = val > LIMIT;			//if high proximity
+		int intermediary = (val > LIMIT);	//if high proximity
 		all_prox += intermediary << ir_nb;
 	}
 	if ((get_prox(0) > LIMIT) || (get_prox(1) > LIMIT)) {
@@ -83,48 +75,48 @@ uint8_t save_ir_dist(void){
 }
 
 uint8_t ctrl_if_no_more_obstacles(void){
-	return (save_ir_dist() == 0);
+	return (save_ir_dist() == 0);				//return 1 if no obstacle
 }
 
-uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_position_correct
-	//uint8_t has_corrected_pos = 0;
+uint8_t correct_position_one_step(uint8_t all_prox){
 	switch (all_prox) {
 		case 0 : 			chThdSleepMilliseconds(500); //DANCE;
 		break;
 		
-		case 0b11111111:	obsAlarm();
+		case 0b11111111:	obsAlarm();			//obstacles everywhere
 		break; 
 		
-		case 0b11000000:	turn_left(45);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b11000000:	turn_left(45);		//free only in front left
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
 		
-		case 0b00100000:	turn_left(90);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b00100000:	turn_left(90);		//free only in left
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
 		
-		case 0b00010000:	turn_left(135);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b00010000:	turn_left(135);		//free only in back left
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
 		
-		case 0b00001000:	turn_right(135);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b00001000:	turn_right(135);	//free only in back right
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
 		
-		case 0b00000100:	turn_right(90);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b00000100:	turn_right(90);		//free only in right
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
 		
-		case 0b00000011:	turn_right(45);
-						move(MOVE_DEFAULT);
-						return 1;	//has_corrected_pos += 1;
+		case 0b00000011:	turn_right(45);		//free only in right
+							move(MOVE_DEFAULT);
+							return 1;
 		break;
-		default:		//plein de if;
+		
+		default:								//otherwise: tries most evident
 			if ((all_prox | 11101100) == 11111100) {
 				turn_right(45);
 				move(MOVE_DEFAULT);
@@ -144,31 +136,24 @@ uint8_t correct_position_one_step(uint8_t all_prox){	//deleted , uint16_t nb_pos
 				turn_left(90);
 				move(MOVE_DEFAULT);
 			}
-			return 1;	//has_corrected_pos += 1;
+			return 1;
 		break;
 	}
-	return 0;	//return has_corrected_pos;
+	return 0;
 }
 
+//-----------------------ALARM BLOCKING-----------------------
+
 void obsAlarm(void){			//if there are obstacles everywhere
-	uint8_t blocked = 1;
-	while ((blocked == 1)) {
-		set_led(1, 1);
-		set_led(3, 1);
-		set_led(5, 1);
-		set_led(7, 1);
-		chThdSleepMilliseconds(1000);	//sleeps 1000 ms
-		set_led(1, 0);
-		set_led(3, 0);
-		set_led(5, 0);
-		set_led(7, 0);
-		if (ctrl_if_no_more_obstacles()) {blocked = 0;}
-	}
+	do {
+		set_led(0, 2);			//(led [not 1-7 --> all], value [not 0-1 --> toggle])
+	} while (!(ctrl_if_no_more_obstacles()));
+	set_led(0, 0);
 }
 
 //------------------------MOVES--------------------------------
 
-void move(int16_t distance) {		// distance must be given in steps
+void move(int16_t distance) {	// distance must be given in steps
 	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
@@ -204,15 +189,6 @@ void turn_left (uint16_t angle) {
 	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
-/*	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter
-	left_motor_set_pos(-nb_steps);
-	right_motor_set_pos(nb_steps);
-	left_motor_set_speed(-SPEED_DEFAULT);
-	right_motor_set_speed(SPEED_DEFAULT);
-	chfThdSleepMilliseconds((nb_steps/1000)/SPEED_DEFAULT);
-	left_motor_set_speed(0);
-	right_motor_set_speed(0);
-	*/
 }
 
 void turn_right (uint16_t angle){
@@ -228,13 +204,4 @@ void turn_right (uint16_t angle){
 	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
-/*	int32_t nb_steps = (3500/13)*angle;	//1000 steps/tour * wheel_diameter / perimeter
-	left_motor_set_pos(nb_steps);
-	right_motor_set_pos(-nb_steps);
-	left_motor_set_speed(SPEED_DEFAULT);
-	right_motor_set_speed(-SPEED_DEFAULT);
-	chfThdSleepMilliseconds((nb_steps/1000)/SPEED_DEFAULT);
-	left_motor_set_speed(0);
-	right_motor_set_speed(0);
-	*/
 }
