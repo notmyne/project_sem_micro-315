@@ -106,7 +106,11 @@ int main(void)
     //init audio module
     playMelodyStart();
 
-    testThd_start();
+    //testThd_start();
+
+
+    danceThd_start();
+    danceSetSong(STARWARS_D);
 
 
     messagebus_init(&bus, &bus_lock, &bus_condvar);

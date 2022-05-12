@@ -17,7 +17,7 @@
 #include <audio/audio_thread.h>
 #include <obstacles.h>
 
-#define MS2STEP(MS) (MS * SPEED_DEFAULT)
+#define MS2STEP(MS) (((float)MS)/1000.f * SPEED_DEFAULT)
 
 //local current dance variable
 static dance_choice_t current_song = CORNER_GUY_D;
@@ -130,10 +130,14 @@ static const float starwars_tempo[] = {
 	4.8, 12, 3.6, 4.8, 12, 3.6
 };
 
+static const uint16_t tempo_array_size[] = {
+	0, 812, 248, 312, 76, 4
+};
+
 
 //------------------------------------INTERNAL FUNCTIONS-----------------------------------------
 
-const float* danceTable(dance_choice_t dnc){
+const float*  danceTable(dance_choice_t dnc){
 	switch(dnc){
 	case CORNER_GUY_D :
 		return NULL;
@@ -151,12 +155,19 @@ const float* danceTable(dance_choice_t dnc){
 
 
 void danceEX(dance_choice_t dnc){
-	uint16_t noteDuration = 0;
+	set_led(LED3, TRUE);
+	chprintf((BaseSequentialStream*)&SD3, "danceEx launch\n\r");
+	uint16_t noteDuration = 0, pauseBetweenNotes = 0;
 	const float* ref_d = danceTable(dnc);
-	uint16_t len = sizeof(ref_d)/sizeof(ref_d[0]);
+	chprintf((BaseSequentialStream*)&SD3, "dance number = %u\n\r",dnc,"\n");
+	uint16_t len = tempo_array_size[dnc]/sizeof(ref_d[0]);
 	for(uint16_t i; i < len; i++){
-		noteDuration = (uint16_t)(1000 / ref_d[i]);
+		noteDuration = (uint16_t)(1000/ ref_d[i]);
+		pauseBetweenNotes = (uint16_t)(noteDuration * 1.30);
+		chprintf((BaseSequentialStream*)&SD3, "\nexec move %u\n\r", noteDuration);
 		move((int16_t)MS2STEP(noteDuration));
+		chThdSleepMilliseconds(pauseBetweenNotes);
+		chprintf((BaseSequentialStream*)&SD3, "\nsteps called %u\n\r", (int16_t)MS2STEP(noteDuration));
 	}
 
 }
@@ -167,7 +178,7 @@ void danceEX(dance_choice_t dnc){
 //-----------------------------------END INTERNAL FUNCTIONS--------------------------------------
 
 
-static THD_WORKING_AREA(waDanceThd, 512);
+static THD_WORKING_AREA(waDanceThd, 2048);
 static THD_FUNCTION(DanceThd, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -193,29 +204,31 @@ static THD_FUNCTION(DanceThd, arg) {
     			break;
     		case PIRATES_OF_THE_CARIBBEAN_D :
     			clear_leds();
-    			playMelody(PIRATES_OF_THE_CARIBBEAN, ML_SIMPLE_PLAY, NULL);
+    			//playMelody(PIRATES_OF_THE_CARIBBEAN, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
-
+    			current_song = CORNER_GUY_D;
     			break;
     		case SANDSTORMS_D :
     			clear_leds();
-    			playMelody(SANDSTORMS, ML_SIMPLE_PLAY, NULL);
+    			//playMelody(SANDSTORMS, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
-
+    			current_song = CORNER_GUY_D;
     			break;
     		case MARIO_D :
     			clear_leds();
-    			playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
+    			//playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
+    			current_song = CORNER_GUY_D;
     			break;
     		case STARWARS_D :
     			clear_leds();
-    			playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
+    			//playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
+    			current_song = CORNER_GUY_D;
     			break;
     	}
 
@@ -229,7 +242,9 @@ static THD_FUNCTION(DanceThd, arg) {
 
 //------------------------------------EXTERNAL FUNCTIONS-----------------------------------------
 void danceThd_start(void){
+	current_song = CORNER_GUY_D;
 	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);
+
 }
 
 
