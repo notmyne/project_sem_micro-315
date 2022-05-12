@@ -23,7 +23,7 @@ Principle of this file:
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
 #define SPEED_DEFAULT 800		//steps/second, max 1000
-#define LIMIT 1					//proximity limit for obstacles
+#define LIMIT 600					//proximity limit for obstacles
 
 //------------------------OBSTACLES THREAD DECLARATION (mainly for IRs)--------------
 static THD_WORKING_AREA(threadObstaclesWorkingArea, 128);
