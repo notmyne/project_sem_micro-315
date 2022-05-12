@@ -7,6 +7,7 @@
 #include <chprintf.h>
 #include <motors.h>
 #include <audio/microphone.h>
+#include "leds.h"
 
 #include <audio_processing.h>
 #include <fft.h>
@@ -15,6 +16,8 @@
 #include <audio/play_melody.h>
 #include <audio/audio_thread.h>
 #include <obstacles.h>
+
+#define MS2STEP(MS) (MS * SPEED_DEFAULT)
 
 //local current dance variable
 static dance_choice_t current_song = CORNER_GUY_D;
@@ -130,7 +133,33 @@ static const float starwars_tempo[] = {
 
 //------------------------------------INTERNAL FUNCTIONS-----------------------------------------
 
+const float* danceTable(dance_choice_t dnc){
+	switch(dnc){
+	case CORNER_GUY_D :
+		return NULL;
+	case PIRATES_OF_THE_CARIBBEAN_D :
+		return pirate_tempo;
+	case SANDSTORMS_D :
+		return sandstorms_tempo;
+	case MARIO_D :
+		return mario_tempo;
+	case STARWARS_D :
+		return starwars_tempo;
+	}
+	return NULL;
+}
 
+
+void danceEX(dance_choice_t dnc){
+	uint16_t noteDuration = 0;
+	const float* ref_d = danceTable(dnc);
+	uint16_t len = sizeof(ref_d)/sizeof(ref_d[0]);
+	for(uint16_t i; i < len; i++){
+		noteDuration = (uint16_t)(1000 / ref_d[i]);
+		move((int16_t)MS2STEP(noteDuration));
+	}
+
+}
 
 
 
@@ -143,12 +172,52 @@ static THD_FUNCTION(DanceThd, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
-
+    static uint8_t counter = 0;
     //systime_t time;
 
     while(1){
         //time = chVTGetSystemTime();
+    	switch(current_song){
+    		case CORNER_GUY_D :
+    			set_led(LED1, TRUE);
+//    			counter++;
+//    			switch (counter){
+//					 case 128 :
+//						 set_led(LED1, TRUE);
+//						 break;
+//					 case 255 :
+//						 clear_leds();
+//						 break;
+//    			}
 
+    			break;
+    		case PIRATES_OF_THE_CARIBBEAN_D :
+    			clear_leds();
+    			playMelody(PIRATES_OF_THE_CARIBBEAN, ML_SIMPLE_PLAY, NULL);
+
+    			danceEX(current_song);
+
+    			break;
+    		case SANDSTORMS_D :
+    			clear_leds();
+    			playMelody(SANDSTORMS, ML_SIMPLE_PLAY, NULL);
+
+    			danceEX(current_song);
+
+    			break;
+    		case MARIO_D :
+    			clear_leds();
+    			playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
+
+    			danceEX(current_song);
+    			break;
+    		case STARWARS_D :
+    			clear_leds();
+    			playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
+
+    			danceEX(current_song);
+    			break;
+    	}
 
 
         //chThdSleepUntilWindowed(time, time + MS2ST(2000));
@@ -164,13 +233,14 @@ void danceThd_start(void){
 }
 
 
-void danceChangeSong(dance_choice_t dnc){
+void danceSetSong(dance_choice_t dnc){
 	current_song = dnc;
 }
 
 dance_choice_t danceGetSong(void){
 	return current_song;
 }
+
 
 
 //-----------------------------------END ExTERNAL FUNCTIONS--------------------------------------

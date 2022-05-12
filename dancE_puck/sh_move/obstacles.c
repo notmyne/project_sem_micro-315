@@ -28,7 +28,6 @@ uint8_t save_ir_dist();
 int ctrl_if_no_more_obstacles();*/
 
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
-#define SPEED_DEFAULT 800		//steps/second, max 1000
 #define LIMIT 1					//proximity limit for obstacles
 
 //------------------------OBSTACLES THREAD DECLARATION (mainly for IRs---------------
@@ -38,6 +37,10 @@ static THD_FUNCTION(threadObstacles, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
+
+    calibrate_ir();
+    proximity_start();
+
 	while(1) {
 		avoid_obstacles();
 		
@@ -57,8 +60,7 @@ void avoid_obstacles(void){
 	uint16_t nb_position_correct = 0;
 
 
-    calibrate_ir();
-    proximity_start();
+
 
 	uint8_t all_prox = save_ir_dist();
 	if (nb_position_correct < nb_position_correction_max) {
@@ -168,7 +170,7 @@ void obsAlarm(void){			//if there are obstacles everywhere
 
 //------------------------MOVES--------------------------------
 
-void move(int16_t distance) {		// distance must be given in steps
+void move(int16_t distance) {
 	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
@@ -180,7 +182,7 @@ void move(int16_t distance) {		// distance must be given in steps
 		}
 	}else{
 		while(right_motor_get_pos() <= position_to_reach_right
-				    && left_motor_get_pos() <= position_to_reach_left){
+		    && left_motor_get_pos() <= position_to_reach_left){
 			left_motor_set_speed(SPEED_DEFAULT);
 			right_motor_set_speed(SPEED_DEFAULT);
 		}

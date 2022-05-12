@@ -16,7 +16,7 @@ typedef enum{
 //static dance_choice_t current_dance = 0;
 
 void danceThd_start(void);
-void danceChangeSong(dance_choice_t dnc);
+void danceSetSong(dance_choice_t dnc);
 dance_choice_t danceGetSong(void);
 
 #endif

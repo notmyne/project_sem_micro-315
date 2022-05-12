@@ -69,7 +69,6 @@ static THD_FUNCTION(TestThd, arg) {
     (void)arg;
 
     //systime_t time;
-    turn_left(45);
 
     while(1){
         //time = chVTGetSystemTime();
@@ -77,6 +76,9 @@ static THD_FUNCTION(TestThd, arg) {
 
         //100Hz
         //chThdSleepUntilWindowed(time, time + MS2ST(2000));
+
+        turn_left(90);
+        move(1000);
     }
 }
 
@@ -106,8 +108,10 @@ int main(void)
 
     testThd_start();
 
-    obstacles_start();
+
     messagebus_init(&bus, &bus_lock, &bus_condvar);
+
+    //obstacles_start();
 
 #ifdef DOUBLE_BUFFERING
     //send_tab is used to save the state of the buffer to send (double buffering)

@@ -7,10 +7,11 @@ extern "C" {
 
 #define POSITION_NOT_REACHED 0
 #define POSITION_REACHED 1
+#define SPEED_DEFAULT 800		//steps/second, max 1000
 
 
 void avoid_obstacles(void);
-void move(int16_t distance);
+void move(int16_t distance); // distance must be given in steps
 void obsAlarm(void);			//if there are obstacles everywhere
 void turn_right (uint16_t angle);
 void turn_left (uint16_t angle);
