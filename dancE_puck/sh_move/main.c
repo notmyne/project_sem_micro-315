@@ -110,7 +110,7 @@ int main(void)
 
 
     danceThd_start();
-    danceSetSong(STARWARS_D);
+    danceSetSong(PIRATES_OF_THE_CARIBBEAN_D);
 
 
     messagebus_init(&bus, &bus_lock, &bus_condvar);

@@ -7,11 +7,13 @@ Principle of this file:
 * If too much corrections of positions, the bot considers itself blocked
 * When blocked, the bot controls sometimes if it can move again
 * main function here: void avoid_obstacles()*/
-
+#include "ch.h"
+#include "hal.h"
 #include "leds.h"
 #include "motors.h"
 #include <sensors/proximity.h>
 #include "obstacles.h"
+#include <chprintf.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -167,16 +169,17 @@ void move(int16_t distance) {	// distance must be given in steps
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
 	if (distance < 0){
+		left_motor_set_speed(-SPEED_DEFAULT);
+		right_motor_set_speed(-SPEED_DEFAULT);
 		while(right_motor_get_pos() >= position_to_reach_right
 		    && left_motor_get_pos() >= position_to_reach_left){
-			left_motor_set_speed(-SPEED_DEFAULT);
-			right_motor_set_speed(-SPEED_DEFAULT);
 		}
 	}else{
+		left_motor_set_speed(SPEED_DEFAULT);
+		right_motor_set_speed(SPEED_DEFAULT);
 		while(right_motor_get_pos() <= position_to_reach_right
 		    && left_motor_get_pos() <= position_to_reach_left){
-			left_motor_set_speed(SPEED_DEFAULT);
-			right_motor_set_speed(SPEED_DEFAULT);
+
 		}
 	}
 	left_motor_set_speed(0);
@@ -190,11 +193,11 @@ void turn_left (uint16_t angle) {
 	
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
-	
+	left_motor_set_speed(-SPEED_DEFAULT);
+	right_motor_set_speed(SPEED_DEFAULT);
 	while(left_motor_get_pos() >= pos_to_reach_left 
 			&& right_motor_get_pos() <= pos_to_reach_right) {
-		left_motor_set_speed(-SPEED_DEFAULT);
-		right_motor_set_speed(SPEED_DEFAULT);
+
 	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
@@ -205,12 +208,43 @@ void turn_right (uint16_t angle){
 	
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
-	
+	left_motor_set_speed(SPEED_DEFAULT);
+	right_motor_set_speed(-SPEED_DEFAULT);
 	while(left_motor_get_pos() <= pos_to_reach_left 
 			&& right_motor_get_pos() >= pos_to_reach_right) {
-		left_motor_set_speed(SPEED_DEFAULT);
-		right_motor_set_speed(-SPEED_DEFAULT);
+
 	}
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
+}
+
+void dynamic_move(uint16_t dms){
+	//dynamic speed change depending on duration
+	int16_t dynSpeed = (int16_t)(1100-(2.2*dms)); //linear dynamic speed control [STEP/SECOND]
+	int16_t distance =  (int16_t)(0.001*(float)dms*dynSpeed);
+	chprintf((BaseSequentialStream*)&SD3, "\ndynSpeed %u\n\r", dynSpeed);
+	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
+
+	chprintf((BaseSequentialStream*)&SD3, "\nsteps called %u\n\r", distance);
+		left_motor_set_pos(0);
+		right_motor_set_pos(0);
+		if (distance < 0){
+			left_motor_set_speed(-dynSpeed);
+			right_motor_set_speed(-dynSpeed);
+			while(right_motor_get_pos() >= position_to_reach_right
+			    && left_motor_get_pos() >= position_to_reach_left){
+			}
+		}else{
+			left_motor_set_speed(dynSpeed);
+			right_motor_set_speed(dynSpeed);
+			while(right_motor_get_pos() <= position_to_reach_right
+			    && left_motor_get_pos() <= position_to_reach_left){
+
+			}
+		}
+		left_motor_set_speed(0);
+		right_motor_set_speed(0);
+
+
+
 }
