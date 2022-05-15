@@ -14,6 +14,7 @@ Principle of this file:
 #include <motor_control.h>
 #include <chprintf.h>
 #include <msgbus/messagebus.h>
+#include <dances.h>
 
 
 #include <stdbool.h>
@@ -23,8 +24,6 @@ Principle of this file:
 #define LIMIT 150		//proximity limit for obstacles
 #define CORRECTION_LIMIT 5
 
-//Sert seulement  à tester compilation de fichier seul
-/*void avoid_obstacles(); void move(int distance); void alarm(); void turn_right (int angle); void turn_left (int angle); uint8_t save_ir_dist(); int ctrl_if_no_more_obstacles();*/
 
 //module wide bus, mutex & condvar
 messagebus_t bus;
@@ -66,33 +65,33 @@ static THD_FUNCTION(threadObstacles, arg) {
     calibrate_ir();
 
     while(1){
-
-    	do{
-			for(uint8_t i = 0; i < 8; i++){
-				prox_vals[i]=get_prox(i);
-				maxed = FALSE;
-				if(prox_vals[i] >= LIMIT){
-					maxed = TRUE;
-					evade_obstacle(i);
-					nb_pos_corrections++;
-					break;
-				}
-			}
-			if(nb_pos_corrections > CORRECTION_LIMIT){//dead loop in case not correctable, reset required
-
-				left_motor_set_speed(0);
-				right_motor_set_speed(0);
-
-				do{
-					counter++;
-					if(counter == 1000){
-						set_led(0, 2);			//(led [not 1-7 --> all], value [not 0-1 --> toggle])
-						counter = 0;
+    	if(isDancing()){//check collision only if epuck's dancing
+			do{
+				for(uint8_t i = 0; i < 8; i++){
+					prox_vals[i]=get_prox(i);
+					maxed = FALSE;
+					if(prox_vals[i] >= LIMIT){
+						maxed = TRUE;
+						evade_obstacle(i);
+						nb_pos_corrections++;
+						break;
 					}
-				}while (1);
-			}
-		}while(maxed);
+				}
+				if(nb_pos_corrections > CORRECTION_LIMIT){//dead loop in case not correctable, reset required
 
+					left_motor_set_speed(0);
+					right_motor_set_speed(0);
+
+					do{
+						counter++;
+						if(counter == 1000){
+							set_led(0, 2);			//(led [not 1-7 --> all], value [not 0-1 --> toggle])
+							counter = 0;
+						}
+					}while (1);
+				}
+			}while(maxed);
+    	};
     	maxed = FALSE;
     	nb_pos_corrections = 0;
 		chThdSleepMilliseconds(500);

@@ -147,7 +147,8 @@ build/obj/audio_processing.o: audio_processing.c \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\strings.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\sys\string.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\math.h \
- ../../lib/e-puck2_main-processor/src/audio/play_melody.h motor_control.h
+ ../../lib/e-puck2_main-processor/src/audio/play_melody.h motor_control.h \
+ dances.h
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h:
 
@@ -454,3 +455,5 @@ c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2
 ../../lib/e-puck2_main-processor/src/audio/play_melody.h:
 
 motor_control.h:
+
+dances.h:

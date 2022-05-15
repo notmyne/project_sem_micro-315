@@ -23,7 +23,7 @@ void processAudioData(int16_t *data, uint16_t num_samples);
 ///*
 //*	put the invoking thread into sleep until it can process the audio datas
 //*/
-//void wait_send_to_computer(void);
+void waitSoundPickUp(void);
 
 /*
 *	Returns the pointer to the BUFFER_NAME_t buffer asked
@@ -34,6 +34,6 @@ uint16_t get_peak_pos(const float*buffer, uint16_t size);
 
 float get_frequency(uint16_t peak_pos);
 
-void command_motors(float frequency);
+uint8_t freq2dance(float frequency);
 
 #endif /* AUDIO_PROCESSING_H */

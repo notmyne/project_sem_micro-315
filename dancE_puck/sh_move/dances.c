@@ -23,6 +23,9 @@
 //local current dance variable
 static dance_choice_t current_song = CORNER_GUY_D;
 
+static uint8_t is_dancing = 0;
+
+static BSEMAPHORE_DECL(danceProcess_sem, TRUE);
 
 //tempos of the dance repertoire
 // Pirates of the Caribbean main theme tempo
@@ -156,8 +159,8 @@ const float*  danceTable(dance_choice_t dnc){
 
 
 void danceEX(dance_choice_t dnc){
-	//set_led(LED3, TRUE);
-	//chprintf((BaseSequentialStream*)&SD3, "danceEx launch\n\r");
+	chBSemSignal(&danceProcess_sem);
+	is_dancing = TRUE;
 	uint16_t noteDuration = 0, pauseBetweenNotes = 0;
 	const float* ref_d = danceTable(dnc);
 	//chprintf((BaseSequentialStream*)&SD3, "dance number = %u\n\r",dnc,"\n");
@@ -171,12 +174,15 @@ void danceEX(dance_choice_t dnc){
 
 		chThdSleepMilliseconds(pauseBetweenNotes);;
 	}
-
+	is_dancing = FALSE;
 }
 
 
 //-----------------------------------END INTERNAL FUNCTIONS--------------------------------------
 
+void waitDanceFinish(void){
+	chBSemWait(&danceProcess_sem);
+}
 
 //dance thread declaration
 static THD_WORKING_AREA(waDanceThd, 2048);
@@ -189,43 +195,31 @@ static THD_FUNCTION(DanceThd, arg) {
 
     while(1){
         //time = chVTGetSystemTime();
+    	waitSoundPickUp();
     	switch(current_song){
     		case CORNER_GUY_D :
-    			set_led(LED1, TRUE);
-//    			counter++;
-//    			switch (counter){
-//					 case 128 :
-//						 set_led(LED1, TRUE);
-//						 break;
-//					 case 255 :
-//						 clear_leds();
-//						 break;
-//    			}
+
 
     			break;
     		case PIRATES_OF_THE_CARIBBEAN_D :
-    			clear_leds();
     			playMelody(PIRATES_OF_THE_CARIBBEAN, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
     			current_song = CORNER_GUY_D;
     			break;
     		case SANDSTORMS_D :
-    			clear_leds();
     			playMelody(SANDSTORMS, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
     			current_song = CORNER_GUY_D;
     			break;
     		case MARIO_D :
-    			clear_leds();
     			playMelody(MARIO, ML_SIMPLE_PLAY, NULL);
 
     			danceEX(current_song);
     			current_song = CORNER_GUY_D;
     			break;
     		case STARWARS_D :
-    			clear_leds();
 
     			playMelody(STARWARS, ML_FORCE_CHANGE, NULL);
     			danceEX(current_song);
@@ -243,6 +237,11 @@ static THD_FUNCTION(DanceThd, arg) {
 
 
 //------------------------------------EXTERNAL FUNCTIONS-----------------------------------------
+
+uint8_t isDancing(void){
+	return is_dancing;
+}
+
 void danceThd_start(void){
 	current_song = CORNER_GUY_D;
 	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);

@@ -11,10 +11,11 @@
 #include <arm_math.h>
 #include <audio/play_melody.h>
 #include <motor_control.h>
+#include <dances.h>
 
 
 //semaphore
-//static BSEMAPHORE_DECL(audioProcess_sem, TRUE);
+static BSEMAPHORE_DECL(soundPickUpProcess_sem, TRUE);
 
 //2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
 static float micLeft_cmplx_input[2 * FFT_SIZE];
@@ -27,6 +28,8 @@ static float micRight_output[FFT_SIZE];
 static float micFront_output[FFT_SIZE];
 static float micBack_output[FFT_SIZE];
 
+static const float freq_tab[] = {550, 620, 666, 697};
+static const float epsilon = 3;
 /*
 *	Callback called when the demodulation of the four microphones is done.
 *	We get 160 samples per mic every 10ms (16kHz)
@@ -54,7 +57,8 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	float* const buffer_front_output = get_audio_buffer_ptr(FRONT_OUTPUT);
 	float* const buffer_back_output = get_audio_buffer_ptr(BACK_OUTPUT);
 
-	static uint8_t cnt_process = 0;
+	static uint8_t  dance_idx = 0;
+	static uint8_t cnt_process = 0, cnt_redun = 0;
 	static uint16_t nb_sample = 0;
 
 	//fills the input buffers of FFT_SIZE(*2) with 640samples/10ms
@@ -92,36 +96,31 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 
 
-//#define SEND_DATA_TO_PC
-#ifdef SEND_DATA_TO_PC
 
-	if(cnt_process == 10){
-
-		chBSemSignal(&sendToComputer_sem);
+	if (cnt_process >0) {
 		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
-		chprintf((BaseSequentialStream *) &SDU1, "peak at %f Hz\r\n", peak_frequency);
-
-		command_motors(peak_frequency);
+		if(dance_idx == freq2dance(peak_frequency)){
+			dance_idx = freq2dance(peak_frequency);
+			cnt_redun++;
+		}else{
+			cnt_redun = 0;
+		}
 		cnt_process = 0;
 	}
-#else
-	if (cnt_process > 0) {
-		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
-		const float peak_frequency = get_frequency(peak_pos);
-
-		//command_motors(peak_frequency);
-
-		cnt_process = 0;
+	if(cnt_redun >= 50){ //if freq is persistent then it is considered as input
+		chBSemSignal(&soundPickUpProcess_sem);
+		danceSetSong(dance_idx);
 	}
-#endif
-
+	if(isDancing()){
+		waitDanceFinish();
+	}
 }
 
 
-//void wait_send_to_computer(void){
-//	chBSemWait(&sendToComputer_sem);
-//}
+void waitSoundPickUp(void){
+	chBSemWait(&soundPickUpProcess_sem);
+}
 
 float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 	if(name == LEFT_CMPLX_INPUT){
@@ -177,16 +176,11 @@ float get_frequency(uint16_t peak_pos) {
 	return slope * (peak_pos - x0) + y0;
 }
 
-void command_motors(float frequency) {
-	if (frequency > 1000.0f) {
-
-		uint16_t speed = (uint16_t) (frequency / 4.0f);
-		if (speed > 2200)
-			speed = 2200;
-		right_motor_set_speed(speed);
-		left_motor_set_speed(speed);
-	} else {
-		right_motor_set_speed(0);
-		left_motor_set_speed(0);
+uint8_t freq2dance(float frequency) {
+	for(uint8_t i = 0; i < 4; i++){
+		if(frequency > (freq_tab[i]-epsilon) && frequency < (freq_tab[i]+epsilon)){
+			return i+1;
+		}
 	}
+	return 0;
 }
