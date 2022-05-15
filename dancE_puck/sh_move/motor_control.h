@@ -8,7 +8,7 @@
 #define POSITION_REACHED 1
 #define SPEED_DEFAULT 800		//steps/second, max 1100
 #define MOVE_DEFAULT 500		//to change, distance by default when have to move
-#define LIMIT 1					//proximity limit for obstacles
+
 
 void move(int16_t distance); // distance must be given in steps
 void turn_right (uint16_t angle);
