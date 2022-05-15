@@ -31,9 +31,7 @@
 
 //static complex_float altBufferCmplxInput[FFT_SIZE];
 
-messagebus_t bus;
-MUTEX_DECL(bus_lock);
-CONDVAR_DECL(bus_condvar);
+
 
 static void serial_start(void)
 {
@@ -109,14 +107,13 @@ int main(void)
 
     //testThd_start();
 
+//
+//    danceThd_start();
+//    danceSetSong(STARWARS_D);
 
-    danceThd_start();
-    danceSetSong(STARWARS_D);
-
-
-    messagebus_init(&bus, &bus_lock, &bus_condvar);
-
-    //obstacles_start();
+    //messagebus_init(&bus, &bus_lock, &bus_condvar);
+    chprintf((BaseSequentialStream*) &SD3, "obstacles.c not launched yet\n\r");
+    obstacles_start();
 
 #ifdef DOUBLE_BUFFERING
     //send_tab is used to save the state of the buffer to send (double buffering)

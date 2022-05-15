@@ -9,6 +9,7 @@ extern "C" {
 #include "hal.h"
 
 
+
 void avoid_obstacles(void);
 void obsAlarm(void);			//if there are obstacles everywhere
 void obstacles_start(void);

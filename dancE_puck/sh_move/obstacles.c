@@ -13,6 +13,8 @@ Principle of this file:
 #include <sensors/proximity.h>
 #include "obstacles.h"
 #include <motor_control.h>
+#include <chprintf.h>
+#include <main.h>
 
 
 #include <stdbool.h>
@@ -23,20 +25,28 @@ Principle of this file:
 //Sert seulement  à tester compilation de fichier seul
 /*void avoid_obstacles(); void move(int distance); void alarm(); void turn_right (int angle); void turn_left (int angle); uint8_t save_ir_dist(); int ctrl_if_no_more_obstacles();*/
 
-
+//module wide bus, mutex & condvar
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
 
 //------------------------OBSTACLES THREAD DECLARATION (mainly for IRs)--------------
-static THD_WORKING_AREA(threadObstaclesWorkingArea, 128);
 
+
+static THD_WORKING_AREA(threadObstaclesWorkingArea, 2048);
 static THD_FUNCTION(threadObstacles, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
 
-    calibrate_ir();
+    //
     proximity_start();
-
+    calibrate_ir();
+    //messagebus_topic_t *prox_topic = messagebus_find_topic_blocking(&bus, "/proximity");
+    //proximity_msg_t prox_values;
 	while(1) {
+		//messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
 		avoid_obstacles();
 		
 		chThdSleepMilliseconds(500);
@@ -44,12 +54,15 @@ static THD_FUNCTION(threadObstacles, arg) {
 }
 
 void obstacles_start(void) {
+    chprintf((BaseSequentialStream*) &SD3, "obstacles.c thread initialized\n\r");
+
 	(void)chThdCreateStatic(threadObstaclesWorkingArea,
 		sizeof(threadObstaclesWorkingArea), NORMALPRIO, threadObstacles, NULL);
-	}
+}
 
 //------------------------OBSTACLES AVOIDANCE----------------------------------------
 void avoid_obstacles(void){
+	chprintf((BaseSequentialStream*) &SD3, "obstacle avoidance active\n\r");
 	uint16_t nb_pos_corrections_max = 1000;
 	uint16_t nb_pos_corrections = 0;
 
@@ -162,30 +175,5 @@ void obsAlarm(void){			//if there are obstacles everywhere
 	set_led(0, 0);
 }
 
-//------------------------MOVES--------------------------------
 
-//----------------------------------MOVE INTERNAL FUNCTIONS----------------------------------------
-
-////xorshift 32bit RNG
-//struct xorshift32_state {
-//  uint32_t a;
-//};
-//
-//static struct xorshift32_state rng_state = {2147483647};
-//
-//
-///* The state word must be initialized to non-zero */
-//uint32_t xorshift32(struct xorshift32_state *state)
-//{
-//	/* Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs" */
-//	uint32_t x = state->a;
-//	x ^= x << 13;
-//	x ^= x >> 17;
-//	x ^= x << 5;
-//	return state->a = x;
-//}
-
-
-
-//-------------------------------END MOVE INTERNAL FUNCTIONS--------------------------------------
 
