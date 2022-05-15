@@ -130,8 +130,7 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/mmc_spi.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h \
- ../../lib/e-puck2_main-processor/src/memory_protection.h \
- ../../lib/e-puck2_main-processor/src/usbcfg.h main.h \
+ ../../lib/e-puck2_main-processor/src/memory_protection.h main.h \
  ../../lib/e-puck2_main-processor/src/camera/dcmi_camera.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/include/dcmi.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/include/../ports/STM32/STM32F4xx/dcmi_lld.h \
@@ -146,13 +145,14 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/src/motors.h \
  ../../lib/e-puck2_main-processor/src/audio/microphone.h \
  ../../lib/e-puck2_main-processor/src/audio/mp45dt02_processing.h \
- audio_processing.h fft.h communications.h \
+ audio_processing.h fft.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/arm_math.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/core_cm4.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\math.h \
  ../../lib/e-puck2_main-processor/src/audio/play_melody.h \
  ../../lib/e-puck2_main-processor/src/audio/audio_thread.h obstacles.h \
- dances.h ../../lib/e-puck2_main-processor/src/sensors/proximity.h
+ dances.h ../../lib/e-puck2_main-processor/src/sensors/proximity.h \
+ motor_control.h
 
 c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\stdio.h:
 
@@ -420,8 +420,6 @@ mcuconf.h:
 
 ../../lib/e-puck2_main-processor/src/memory_protection.h:
 
-../../lib/e-puck2_main-processor/src/usbcfg.h:
-
 main.h:
 
 ../../lib/e-puck2_main-processor/src/camera/dcmi_camera.h:
@@ -456,8 +454,6 @@ audio_processing.h:
 
 fft.h:
 
-communications.h:
-
 ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/arm_math.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/core_cm4.h:
@@ -473,3 +469,5 @@ obstacles.h:
 dances.h:
 
 ../../lib/e-puck2_main-processor/src/sensors/proximity.h:
+
+motor_control.h:

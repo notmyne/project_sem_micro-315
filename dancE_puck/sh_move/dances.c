@@ -11,11 +11,12 @@
 
 #include <audio_processing.h>
 #include <fft.h>
-#include <communications.h>
 #include <arm_math.h>
 #include <audio/play_melody.h>
 #include <audio/audio_thread.h>
 #include <obstacles.h>
+#include <motor_control.h>
+
 
 #define MS2STEP(MS) (((float)MS)/1000.f * SPEED_DEFAULT)
 
@@ -155,29 +156,29 @@ const float*  danceTable(dance_choice_t dnc){
 
 
 void danceEX(dance_choice_t dnc){
-	set_led(LED3, TRUE);
-	chprintf((BaseSequentialStream*)&SD3, "danceEx launch\n\r");
+	//set_led(LED3, TRUE);
+	//chprintf((BaseSequentialStream*)&SD3, "danceEx launch\n\r");
 	uint16_t noteDuration = 0, pauseBetweenNotes = 0;
 	const float* ref_d = danceTable(dnc);
-	chprintf((BaseSequentialStream*)&SD3, "dance number = %u\n\r",dnc,"\n");
+	//chprintf((BaseSequentialStream*)&SD3, "dance number = %u\n\r",dnc,"\n");
 	uint16_t len = tempo_array_size[dnc]/sizeof(ref_d[0]);
 	for(uint16_t i = 0; i < len; i++){
 		noteDuration = (uint16_t)(1000/ ref_d[i]);
 		pauseBetweenNotes = (uint16_t)(noteDuration * 1.30);
 		//chprintf((BaseSequentialStream*)&SD3, "\nexec move %u\n\r", noteDuration);
-		//move((int16_t)MS2STEP(noteDuration));
-		dynamic_move(noteDuration);
+		move((int16_t)MS2STEP(noteDuration));
+		//dynamic_move(noteDuration);
+
 		chThdSleepMilliseconds(pauseBetweenNotes);;
 	}
 
 }
 
 
-
-
 //-----------------------------------END INTERNAL FUNCTIONS--------------------------------------
 
 
+//dance thread declaration
 static THD_WORKING_AREA(waDanceThd, 2048);
 static THD_FUNCTION(DanceThd, arg) {
 
@@ -225,9 +226,10 @@ static THD_FUNCTION(DanceThd, arg) {
     			break;
     		case STARWARS_D :
     			clear_leds();
-    			playMelody(STARWARS, ML_SIMPLE_PLAY, NULL);
 
+    			playMelody(STARWARS, ML_FORCE_CHANGE, NULL);
     			danceEX(current_song);
+
     			current_song = CORNER_GUY_D;
     			break;
     	}
@@ -243,7 +245,7 @@ static THD_FUNCTION(DanceThd, arg) {
 //------------------------------------EXTERNAL FUNCTIONS-----------------------------------------
 void danceThd_start(void){
 	current_song = CORNER_GUY_D;
-	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO+1, DanceThd, NULL);
+	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);
 
 }
 

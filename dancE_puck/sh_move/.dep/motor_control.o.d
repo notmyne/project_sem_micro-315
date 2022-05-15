@@ -1,4 +1,4 @@
-build/obj/dances.o: dances.c dances.h \
+build/obj/motor_control.o: motor_control.c motor_control.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/compilers/GCC/chtypes.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\lib\gcc\arm-none-eabi\7.2.1\include\stddef.h \
@@ -149,10 +149,9 @@ build/obj/dances.o: dances.c dances.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\sys\string.h \
  c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2017-q4-major-win32\arm-none-eabi\include\math.h \
  ../../lib/e-puck2_main-processor/src/audio/play_melody.h \
- ../../lib/e-puck2_main-processor/src/audio/audio_thread.h obstacles.h \
- motor_control.h
+ ../../lib/e-puck2_main-processor/src/audio/audio_thread.h obstacles.h
 
-dances.h:
+motor_control.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h:
 
@@ -465,5 +464,3 @@ c:\users\victor\desktop\embraked_tps\eclipse_e-puck2\tools\gcc-arm-none-eabi-7-2
 ../../lib/e-puck2_main-processor/src/audio/audio_thread.h:
 
 obstacles.h:
-
-motor_control.h:

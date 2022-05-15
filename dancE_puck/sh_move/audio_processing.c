@@ -7,13 +7,14 @@
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
-#include <communications.h>
 #include <fft.h>
 #include <arm_math.h>
 #include <audio/play_melody.h>
+#include <motor_control.h>
+
 
 //semaphore
-static BSEMAPHORE_DECL(sendToComputer_sem, TRUE);
+//static BSEMAPHORE_DECL(audioProcess_sem, TRUE);
 
 //2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
 static float micLeft_cmplx_input[2 * FFT_SIZE];
@@ -118,9 +119,9 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 }
 
 
-void wait_send_to_computer(void){
-	chBSemWait(&sendToComputer_sem);
-}
+//void wait_send_to_computer(void){
+//	chBSemWait(&sendToComputer_sem);
+//}
 
 float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 	if(name == LEFT_CMPLX_INPUT){
