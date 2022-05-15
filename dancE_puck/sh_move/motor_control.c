@@ -68,7 +68,7 @@ void move(int16_t distance) {	// distance must be given in steps
 }
 
 void turn_left (uint16_t angle) {
-	int16_t pos_to_reach_right = 3.6179*angle, pos_to_reach_left = -pos_to_reach_right;
+	int16_t pos_to_reach_right = TURNING_COEFF*angle, pos_to_reach_left = -pos_to_reach_right;
 
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
@@ -83,7 +83,7 @@ void turn_left (uint16_t angle) {
 }
 
 void turn_right (uint16_t angle){
-	int16_t pos_to_reach_left = 3.6179*angle, pos_to_reach_right = -pos_to_reach_left;
+	int16_t pos_to_reach_left = TURNING_COEFF*angle, pos_to_reach_right = -pos_to_reach_left;
 
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
