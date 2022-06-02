@@ -59,7 +59,7 @@ int main(void)
     danceThd_start();
 
     obstacles_start();
-
+    //chprintf((BaseSequentialStream*) &SD3," seq stest" );
 
 
 

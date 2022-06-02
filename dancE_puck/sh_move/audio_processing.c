@@ -28,7 +28,7 @@ static float micRight_output[FFT_SIZE];
 static float micFront_output[FFT_SIZE];
 static float micBack_output[FFT_SIZE];
 
-static const float freq_tab[] = {550, 620, 666, 697};
+static const float freq_tab[] = {560, 620, 666, 697};
 static const float epsilon = 3;
 /*
 *	Callback called when the demodulation of the four microphones is done.
@@ -57,7 +57,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	float* const buffer_front_output = get_audio_buffer_ptr(FRONT_OUTPUT);
 	float* const buffer_back_output = get_audio_buffer_ptr(BACK_OUTPUT);
 
-	static uint8_t  dance_idx = 0;
+	static uint8_t  dance_idx = 0, pre_dance_idx = 0;
 	static uint8_t cnt_process = 0, cnt_redun = 0;
 	static uint16_t nb_sample = 0;
 
@@ -81,6 +81,9 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 	//FFT full buffers
 	if (nb_sample == 2*FFT_SIZE){
+
+
+
 		doFFT_optimized(FFT_SIZE, buffer_right_cmplx_input);
 		doFFT_optimized(FFT_SIZE, buffer_left_cmplx_input);
 		doFFT_optimized(FFT_SIZE, buffer_front_cmplx_input);
@@ -98,22 +101,30 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 
 	if (cnt_process >0) {
-		const uint16_t peak_pos = get_peak_pos(buffer_front_output, FFT_SIZE);
+		const uint16_t peak_pos = get_peak_pos(buffer_back_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
-		if(dance_idx == freq2dance(peak_frequency)){
-			dance_idx = freq2dance(peak_frequency);
+
+		chprintf((BaseSequentialStream*) &SD3,"peak freq detected %.2f\n\r", peak_frequency);
+
+		dance_idx = freq2dance(peak_frequency);
+		if(dance_idx == pre_dance_idx){
 			cnt_redun++;
 		}else{
 			cnt_redun = 0;
 		}
+		pre_dance_idx = dance_idx;
 		cnt_process = 0;
 	}
-	if(cnt_redun >= 50){ //if freq is persistent then it is considered as input
+	if(cnt_redun >= 50 && dance_idx < 5){ //if freq is persistent then it is considered as input
+
+		chprintf((BaseSequentialStream*) &SD3,"soundPU signal + dance id %d\n\r", dance_idx);
+
 		chBSemSignal(&soundPickUpProcess_sem);
 		danceSetSong(dance_idx);
 	}
 	if(isDancing()){
 		waitDanceFinish();
+		dance_idx = 0;
 	}
 }
 
@@ -182,5 +193,5 @@ uint8_t freq2dance(float frequency) {
 			return i+1;
 		}
 	}
-	return 0;
+	return 255;
 }

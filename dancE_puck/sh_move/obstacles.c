@@ -65,6 +65,11 @@ static THD_FUNCTION(threadObstacles, arg) {
     calibrate_ir();
 
     while(1){
+
+		chprintf((BaseSequentialStream*) &SD3,"obstacle proc\n\r" );
+
+		chprintf((BaseSequentialStream*) &SD3,"ob_dancing check proc value %d\n\r", isDancing());
+
     	if(isDancing()){//check collision only if epuck's dancing
 			do{
 				for(uint8_t i = 0; i < 8; i++){
@@ -91,9 +96,10 @@ static THD_FUNCTION(threadObstacles, arg) {
 					}while (1);
 				}
 			}while(maxed);
+			maxed = FALSE;
+			nb_pos_corrections = 0;
     	};
-    	maxed = FALSE;
-    	nb_pos_corrections = 0;
+
 		chThdSleepMilliseconds(500);
 	}
 
@@ -102,7 +108,7 @@ static THD_FUNCTION(threadObstacles, arg) {
 void obstacles_start(void) {
 
 	(void)chThdCreateStatic(threadObstaclesWorkingArea,
-		sizeof(threadObstaclesWorkingArea), NORMALPRIO, threadObstacles, NULL);
+		sizeof(threadObstaclesWorkingArea), NORMALPRIO+2, threadObstacles, NULL);
 }
 
 

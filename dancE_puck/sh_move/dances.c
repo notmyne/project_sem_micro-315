@@ -159,22 +159,21 @@ const float*  danceTable(dance_choice_t dnc){
 
 
 void danceEX(dance_choice_t dnc){
-	chBSemSignal(&danceProcess_sem);
 	is_dancing = TRUE;
 	uint16_t noteDuration = 0, pauseBetweenNotes = 0;
 	const float* ref_d = danceTable(dnc);
-	//chprintf((BaseSequentialStream*)&SD3, "dance number = %u\n\r",dnc,"\n");
 	uint16_t len = tempo_array_size[dnc]/sizeof(ref_d[0]);
 	for(uint16_t i = 0; i < len; i++){
 		noteDuration = (uint16_t)(1000/ ref_d[i]);
 		pauseBetweenNotes = (uint16_t)(noteDuration * 1.30);
-		//chprintf((BaseSequentialStream*)&SD3, "\nexec move %u\n\r", noteDuration);
-		move((int16_t)MS2STEP(noteDuration));
-		//dynamic_move(noteDuration);
+		//move((int16_t)MS2STEP(noteDuration));
+		dynamic_move(noteDuration);
 
 		chThdSleepMilliseconds(pauseBetweenNotes);;
 	}
 	is_dancing = FALSE;
+	chBSemSignal(&danceProcess_sem);
+
 }
 
 
@@ -195,7 +194,12 @@ static THD_FUNCTION(DanceThd, arg) {
 
     while(1){
         //time = chVTGetSystemTime();
+		chprintf((BaseSequentialStream*) &SD3,"dance loop proc\n\r" );
+
     	waitSoundPickUp();
+
+    	chprintf((BaseSequentialStream*) &SD3,"dance wait done\n\r" );
+
     	switch(current_song){
     		case CORNER_GUY_D :
 
@@ -244,7 +248,7 @@ uint8_t isDancing(void){
 
 void danceThd_start(void){
 	current_song = CORNER_GUY_D;
-	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);
+	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO+1, DanceThd, NULL);
 
 }
 
