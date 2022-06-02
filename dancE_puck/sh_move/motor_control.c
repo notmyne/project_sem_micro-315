@@ -103,8 +103,10 @@ void dynamic_move(uint16_t dms){
 
 		}
 	}
-	flipNum = -flipNum;
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
+
+
+	flipNum = -flipNum;
 
 }

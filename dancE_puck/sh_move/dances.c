@@ -184,21 +184,19 @@ void waitDanceFinish(void){
 }
 
 //dance thread declaration
-static THD_WORKING_AREA(waDanceThd, 2048);
+static THD_WORKING_AREA(waDanceThd, 512);
 static THD_FUNCTION(DanceThd, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-    //systime_t time;
 
     while(1){
-        //time = chVTGetSystemTime();
-		chprintf((BaseSequentialStream*) &SD3,"dance loop proc\n\r" );
+
 
     	waitSoundPickUp();
 
-    	chprintf((BaseSequentialStream*) &SD3,"dance wait done\n\r" );
+
 
     	switch(current_song){
     		case CORNER_GUY_D :
@@ -233,7 +231,6 @@ static THD_FUNCTION(DanceThd, arg) {
     	}
 
 
-        //chThdSleepUntilWindowed(time, time + MS2ST(2000));
     	chThdSleepMilliseconds(1000);
     }
 
@@ -248,7 +245,7 @@ uint8_t isDancing(void){
 
 void danceThd_start(void){
 	current_song = CORNER_GUY_D;
-	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO+1, DanceThd, NULL);
+	chThdCreateStatic(waDanceThd, sizeof(waDanceThd), NORMALPRIO, DanceThd, NULL);
 
 }
 

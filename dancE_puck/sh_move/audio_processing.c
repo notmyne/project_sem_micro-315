@@ -104,8 +104,6 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		const uint16_t peak_pos = get_peak_pos(buffer_back_output, FFT_SIZE);
 		const float peak_frequency = get_frequency(peak_pos);
 
-		chprintf((BaseSequentialStream*) &SD3,"peak freq detected %.2f\n\r", peak_frequency);
-
 		dance_idx = freq2dance(peak_frequency);
 		if(dance_idx == pre_dance_idx){
 			cnt_redun++;
@@ -116,8 +114,6 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		cnt_process = 0;
 	}
 	if(cnt_redun >= 50 && dance_idx < 5){ //if freq is persistent then it is considered as input
-
-		chprintf((BaseSequentialStream*) &SD3,"soundPU signal + dance id %d\n\r", dance_idx);
 
 		chBSemSignal(&soundPickUpProcess_sem);
 		danceSetSong(dance_idx);

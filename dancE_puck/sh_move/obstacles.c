@@ -48,7 +48,7 @@ void evade_obstacle(uint8_t idx){
 //------------------------OBSTACLES THREAD DECLARATION (mainly for IRs)--------------
 
 
-static THD_WORKING_AREA(threadObstaclesWorkingArea, 2048);
+static THD_WORKING_AREA(threadObstaclesWorkingArea, 512);
 static THD_FUNCTION(threadObstacles, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -57,7 +57,6 @@ static THD_FUNCTION(threadObstacles, arg) {
 
     uint8_t maxed = FALSE;
     uint16_t nb_pos_corrections = 0,  counter = 0;
-    int16_t prox_vals[] ={0,0,0,0,0,0,0,0};
 
     messagebus_init(&bus, &bus_lock, &bus_condvar);
     proximity_start();
@@ -66,23 +65,25 @@ static THD_FUNCTION(threadObstacles, arg) {
 
     while(1){
 
-		chprintf((BaseSequentialStream*) &SD3,"obstacle proc\n\r" );
-
-		chprintf((BaseSequentialStream*) &SD3,"ob_dancing check proc value %d\n\r", isDancing());
 
     	if(isDancing()){//check collision only if epuck's dancing
+
+
 			do{
 				for(uint8_t i = 0; i < 8; i++){
-					prox_vals[i]=get_prox(i);
+
 					maxed = FALSE;
-					if(prox_vals[i] >= LIMIT){
+					if(get_prox(i) >= LIMIT){
 						maxed = TRUE;
 						evade_obstacle(i);
+
+
 						nb_pos_corrections++;
 						break;
 					}
 				}
 				if(nb_pos_corrections > CORRECTION_LIMIT){//dead loop in case not correctable, reset required
+
 
 					left_motor_set_speed(0);
 					right_motor_set_speed(0);
@@ -99,6 +100,8 @@ static THD_FUNCTION(threadObstacles, arg) {
 			maxed = FALSE;
 			nb_pos_corrections = 0;
     	};
+
+
 
 		chThdSleepMilliseconds(500);
 	}
