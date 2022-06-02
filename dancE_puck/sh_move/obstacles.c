@@ -81,6 +81,7 @@ static THD_FUNCTION(threadObstacles, arg) {
 						nb_pos_corrections++;
 						break;
 					}
+				chThdSleepMilliseconds(10);
 				}
 				if(nb_pos_corrections > CORRECTION_LIMIT){//dead loop in case not correctable, reset required
 

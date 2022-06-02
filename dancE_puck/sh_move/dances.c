@@ -166,7 +166,6 @@ void danceEX(dance_choice_t dnc){
 	for(uint16_t i = 0; i < len; i++){
 		noteDuration = (uint16_t)(1000/ ref_d[i]);
 		pauseBetweenNotes = (uint16_t)(noteDuration * 1.30);
-		//move((int16_t)MS2STEP(noteDuration));
 		dynamic_move(noteDuration);
 
 		chThdSleepMilliseconds(pauseBetweenNotes);;
@@ -184,7 +183,7 @@ void waitDanceFinish(void){
 }
 
 //dance thread declaration
-static THD_WORKING_AREA(waDanceThd, 512);
+static THD_WORKING_AREA(waDanceThd, 1024);
 static THD_FUNCTION(DanceThd, arg) {
 
     chRegSetThreadName(__FUNCTION__);

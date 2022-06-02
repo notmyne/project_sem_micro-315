@@ -73,8 +73,7 @@ void turn_right (uint16_t angle){
 }
 
 void dynamic_move(uint16_t dms){
-	//uint8_t danceIndex = (uint8_t)(xorshift32(&rng_state)%4);
-	//chprintf((BaseSequentialStream*) &SD3, "dance index: %u\r\n", danceIndex);
+
 	int16_t dynSpeed = 0;
 	static int8_t flipNum = 1;
 	//dynamic speed and distance control depending on duration
@@ -83,12 +82,14 @@ void dynamic_move(uint16_t dms){
 	}else{
 		dynSpeed = flipNum*(int16_t)(947.65-(2.86*dms));
 	}
-	//dynSpeed = flipNum*(int16_t)(1100-(2.15*dms));
+
+
 	int16_t distance =  (int16_t)(0.001*(float)dms*dynSpeed);
 	int16_t position_to_reach_left  = distance, position_to_reach_right = distance;
 
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
+
 	if (distance < 0){
 		left_motor_set_speed(dynSpeed);
 		right_motor_set_speed(dynSpeed);
@@ -103,6 +104,8 @@ void dynamic_move(uint16_t dms){
 
 		}
 	}
+
+
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 
